@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Store - Home</title>
   <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/home.css">
 </head>
 
 <body>
@@ -25,19 +26,27 @@
   </nav>
 
   <div class="container">
-    <div class="card mb-4">
-      <div class="flex items-center gap-2">
-        <input type="text" id="searchInput" placeholder="Search products..." style="flex: 1;">
+    <!-- Hero Section -->
+    <section class="hero mb-6">
+      <h1 class="hero-title">Discover Premium Products</h1>
+      <p class="hero-subtitle">Shop the latest electronics, fashion & books at unbeatable prices</p>
+    </section>
+
+    <!-- Search & Filter -->
+    <div class="card mb-6">
+      <div class="search-filter-container">
+        <input type="text" id="searchInput" placeholder="Search for products...">
         <select id="categoryFilter">
           <option value="all">All Categories</option>
-          <option value="Electronics">Electronics</option>
-          <option value="Clothes">Clothes</option>
-          <option value="Books">Books</option>
+          <option value="Electronics">📱 Electronics</option>
+          <option value="Clothes">👕 Clothes</option>
+          <option value="Books">📚 Books</option>
         </select>
       </div>
     </div>
 
-    <div id="productsContainer" class="products-grid"></div>
+    <!-- Products Grid -->
+    <div id="productsContainer" class="products-grid animate-fadeIn"></div>
   </div>
 
   <script type="module" src="/js/customer/products.js"></script>

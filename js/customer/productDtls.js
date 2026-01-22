@@ -93,15 +93,20 @@ function loadProduct() {
     }
 
     container.innerHTML = `
-        <h2>${product.name}</h2>
-        <img src="${product.image}" width="300">
-        <p>${product.description}</p>
-        <p>Price: ${product.price} EGP</p>
-
-        <button onclick="addToWishlist(${product.id})">
-            Add to Wishlist
-        </button>
+        <div class="card">
+            <h2 class="product-title">${product.name}</h2>
+            <img src="${product.image || '/images/default-product.jpg'}" alt="${product.name}" class="product-image" style="max-width: 400px; height: auto;">
+            <div class="product-info">
+                <p class="product-category">${product.category}</p>
+                <p>${product.description}</p>
+                <p class="product-price">${product.price} EGP</p>
+                <button class="primary mt-4" id="add-to-wishlist-btn">
+                    Add to Wishlist ❤️
+                </button>
+            </div>
+        </div>
     `;
+    document.getElementById("add-to-wishlist-btn").onclick = () => addToWishlist(product.id);
 }
 
 function addToWishlist(id) {

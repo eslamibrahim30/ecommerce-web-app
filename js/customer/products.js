@@ -31,7 +31,13 @@ function displayProducts(list) {
     container.innerHTML = "";
 
     if (list.length === 0) {
-        container.innerHTML = "<p>No products found.</p>";
+        container.innerHTML = `
+            <div class="empty-state" style="grid-column: 1 / -1;">
+                <div class="empty-state-icon">🔍</div>
+                <h3 class="empty-state-title">No products found</h3>
+                <p class="empty-state-text">Try adjusting your search or filter</p>
+            </div>
+        `;
         return;
     }
 
@@ -39,18 +45,26 @@ function displayProducts(list) {
         const productDiv = document.createElement("div");
         productDiv.className = "product-card";
         productDiv.innerHTML = `
-            <img src="${product.image || '/images/default-product.jpg'}" alt="${product.name}">
-            <h3>${product.name}</h3>
-            <p>${product.description}</p>
-            <p><strong>${product.price} EGP</strong></p>
-
-            <button class="wishlist-btn">
-                Add to Wishlist
-            </button>
+            <div class="product-image-wrapper">
+                <img src="${product.image || '/images/default-product.jpg'}" alt="${product.name}" class="product-image">
+                <div class="product-actions">
+                    <button class="product-action-btn wishlist-action" title="Add to Wishlist">❤️</button>
+                </div>
+            </div>
+            <div class="product-info">
+                <span class="product-category">${product.category || 'General'}</span>
+                <h3 class="product-title">${product.name}</h3>
+                <p class="product-description">${product.description || ''}</p>
+                <div class="product-footer">
+                    <div class="product-price">${product.price.toLocaleString()} <span class="currency">EGP</span></div>
+                    <button class="wishlist-btn">Add ❤️</button>
+                </div>
+            </div>
         `;
 
-        productDiv.querySelector("img").onclick = () => openProduct(product.id);
+        productDiv.querySelector(".product-image").onclick = () => openProduct(product.id);
         productDiv.querySelector(".wishlist-btn").onclick = () => addToWishlist(product.id);
+        productDiv.querySelector(".wishlist-action").onclick = () => addToWishlist(product.id);
 
         container.appendChild(productDiv);
     });
