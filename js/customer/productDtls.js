@@ -74,28 +74,34 @@ const products = [
     
 ];
 
-function displayProducts(list) {
-    const container = document.getElementById("productsContainer");
-    container.innerHTML = "";
 
-    list.forEach(product => {
-        container.innerHTML += `
-            <div class="product-card">
-                <img src="${product.image}" onclick="openProduct(${product.id})">
-                <h3>${product.name}</h3>
-                <p>${product.description}</p>
-                <p>${product.price} EGP</p>
-
-                <button onclick="addToWishlist(${product.id})">
-                    Add to Wishlist
-                </button>
-            </div>
-        `;
-    });
+function getProductId() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("id");
 }
 
-function openProduct(id) {
-    window.location.href = "product.html?id=" + id;
+function loadProduct() {
+    const id = getProductId();
+
+    const product = products.find(p => p.id == id);
+
+    const container = document.getElementById("productDetails");
+
+    if (!product) {
+        container.innerHTML = "Product not found";
+        return;
+    }
+
+    container.innerHTML = `
+        <h2>${product.name}</h2>
+        <img src="${product.image}" width="300">
+        <p>${product.description}</p>
+        <p>Price: ${product.price} EGP</p>
+
+        <button onclick="addToWishlist(${product.id})">
+            Add to Wishlist
+        </button>
+    `;
 }
 
 function addToWishlist(id) {
@@ -107,30 +113,7 @@ function addToWishlist(id) {
         wishlist.push(product);
         localStorage.setItem("wishlist", JSON.stringify(wishlist));
         alert("Added to wishlist");
-    } else {
-        alert("Already in wishlist");
     }
 }
 
-document.getElementById("searchInput").addEventListener("input", function () {
-    const value = this.value.toLowerCase();
-
-    const filtered = products.filter(p =>
-        p.name.toLowerCase().includes(value)
-    );
-
-    displayProducts(filtered);
-});
-
-document.getElementById("categoryFilter").addEventListener("change", function () {
-    const category = this.value;
-
-    if (category === "all") {
-        displayProducts(products);
-    } else {
-        const filtered = products.filter(p => p.category === category);
-        displayProducts(filtered);
-    }
-});
-
-displayProducts(products);
+loadProduct();
