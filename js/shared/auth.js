@@ -34,11 +34,19 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // =====================
+// Quick Redirects
+// =====================
+const currentPath = window.location.pathname.replace(/\/$/, ""); // Remove trailing slash for comparison
+if (currentPath === "/login") window.location.href = "/auth/login.html";
+if (currentPath === "/register") window.location.href = "/auth/register.html";
+if (currentPath === "/admin") window.location.href = "/admin/dashboard.html";
+
+// =====================
 // Auth State Observer
 // =====================
 onAuthStateChanged(auth, async (user) => {
   const path = window.location.pathname;
-  
+
   // Route detection
   const isAuthPage = path.includes("auth/login.html") || path.includes("auth/register.html");
   const isAdminPage = path.includes("/admin/");
@@ -54,7 +62,7 @@ onAuthStateChanged(auth, async (user) => {
     try {
       const userDoc = await getDoc(doc(db, "users", user.uid)).catch(() => ({ exists: () => false }));
       const userData = userDoc.exists() ? userDoc.data() : null;
-      
+
       // Guest-only pages (Login/Register)
       if (isAuthPage) {
         window.location.href = userData?.role === "admin" ? "/admin/dashboard.html" : "/index.html";
@@ -160,7 +168,7 @@ window.logout = logout;
 // =====================
 // Note: getElementById does NOT use the "#" symbol
 const registerForm = document.getElementById("registerform");
-const loginForm = document.getElementById("loginform"); 
+const loginForm = document.getElementById("loginform");
 const passInput = document.getElementById("pass");
 const repeatPassInput = document.getElementById("repeatpass");
 const errorBox = document.getElementById("error");
@@ -194,12 +202,12 @@ async function login(email, password) {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
-    
+
     const userDoc = await getDoc(doc(db, "users", user.uid)).catch(e => {
       console.error("Login Profile Access Error:", e);
       return { exists: () => false };
     });
-    
+
     if (userDoc.exists()) {
       const role = userDoc.data().role;
       if (role === "admin") {
