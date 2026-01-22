@@ -1,46 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-  <title>Home</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Store - Home</title>
   <link rel="stylesheet" href="/css/main.css">
 </head>
 
 <body>
-  <nav
-    style="padding: 1rem; background: #eee; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc;">
-    <div>
-      <strong style="font-size: 1.2rem;">My Store</strong>
-      <a href="index.html" style="margin-left: 15px; text-decoration: none; color: #333;">Home</a>
-      <a href="admin.html" id="admin-link"
-        style="margin-left: 15px; text-decoration: none; color: #333; display: none;">Admin</a>
-    </div>
-    <div id="auth-section">
-      <span id="user-email" style="font-weight: bold; margin-right: 10px;"></span>
-      <button id="logout-btn" onclick="logout()"
-        style="padding: 5px 10px; cursor: pointer; display: none;">Logout</button>
-      <a href="login.html" id="login-nav-link" style="text-decoration: none; color: #007bff; display: none;">Login</a>
+  <nav>
+    <a href="index.html" class="nav-brand">My Store</a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="admin.html" id="admin-link" class="nav-link" style="display: none;">Admin</a>
+      <a href="wishlist.html" class="nav-link">Wishlist ❤️</a>
+      <div id="auth-section" class="flex items-center gap-2">
+        <span id="user-email" class="nav-link" style="font-weight: 700;"></span>
+        <button id="logout-btn" onclick="logout()" class="secondary"
+          style="display: none; padding: 0.5rem 1rem;">Logout</button>
+        <a href="login.html" id="login-nav-link" class="nav-link" style="display: none;">Login</a>
+      </div>
     </div>
   </nav>
-  <div class="navbar">
 
-    <h1>My Store</h1>
+  <div class="container">
+    <div class="card mb-4">
+      <div class="flex items-center gap-2">
+        <input type="text" id="searchInput" placeholder="Search products..." style="flex: 1;">
+        <select id="categoryFilter">
+          <option value="all">All Categories</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Clothes">Clothes</option>
+          <option value="Books">Books</option>
+        </select>
+      </div>
+    </div>
 
-    <input type="text" id="searchInput" placeholder="Search products...">
-
-    <select id="categoryFilter">
-      <option value="all">All Categories</option>
-      <option value="Electronics">Electronics</option>
-      <option value="Clothes">Clothes</option>
-      <option value="Books">Books</option>
-    </select>
-
-    <a href="wishlist.html">Wishlist❤️</a>
+    <div id="productsContainer" class="products-grid"></div>
   </div>
 
-  <div id="productsContainer" class="products-grid"></div>
-
   <script src="/js/customer/products.js"></script>
+  <script type="module" src="/js/shared/auth.js" defer></script>
 
 </body>
 
