@@ -38,7 +38,7 @@ const db = getFirestore(app);
 // =====================
 onAuthStateChanged(auth, async (user) => {
   const path = window.location.pathname;
-  const isAuthPage = path.includes("login.html") || path.includes("register.html");
+  const isAuthPage = path.includes("auth/login.html") || path.includes("auth/register.html");
   const isAdminPage = path.includes("admin.html");
 
   if (user) {
@@ -91,7 +91,7 @@ onAuthStateChanged(auth, async (user) => {
     if (!isAuthPage && path !== "/" && !path.endsWith("index.html")) {
       // If on a protected page (like admin), redirect to login
       if (isAdminPage) {
-        window.location.href = "login.html";
+        window.location.href = "auth/login.html";
         return;
       }
     }
@@ -128,7 +128,7 @@ export async function getUserRole() {
 async function logout() {
   try {
     await signOut(auth);
-    window.location.href = "login.html";
+    window.location.href = "auth/login.html";
   } catch (error) {
     console.error("Logout Error:", error.message);
   }
