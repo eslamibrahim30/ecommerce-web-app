@@ -1,20 +1,47 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login</title>
-    <script type="module" src="js/shared/auth.js" defer></script>
-  </head>
-  <body>
-    <form>
-      <label for="email">E-mail</label>
-      <input type="email" name="email" id="email" placeholder="Enter your email">
+<!DOCTYPE html>
+<html>
 
-      <label for="pass">Password</label>
-      <input type="password" name="pass" id="pass" placeholder="Password">
-      
-      <button id="login" type="submit">Login</button>
-    </form>
-  </body>
+<head>
+  <title>Home</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+
+<body>
+  <nav
+    style="padding: 1rem; background: #eee; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc;">
+    <div>
+      <strong style="font-size: 1.2rem;">My Store</strong>
+      <a href="index.html" style="margin-left: 15px; text-decoration: none; color: #333;">Home</a>
+      <a href="admin.html" id="admin-link"
+        style="margin-left: 15px; text-decoration: none; color: #333; display: none;">Admin</a>
+    </div>
+    <div id="auth-section">
+      <span id="user-email" style="font-weight: bold; margin-right: 10px;"></span>
+      <button id="logout-btn" onclick="logout()"
+        style="padding: 5px 10px; cursor: pointer; display: none;">Logout</button>
+      <a href="login.html" id="login-nav-link" style="text-decoration: none; color: #007bff; display: none;">Login</a>
+    </div>
+  </nav>
+  <div class="navbar">
+
+    <h1>My Store</h1>
+
+    <input type="text" id="searchInput" placeholder="Search products...">
+
+    <select id="categoryFilter">
+      <option value="all">All Categories</option>
+      <option value="Electronics">Electronics</option>
+      <option value="Clothes">Clothes</option>
+      <option value="Books">Books</option>
+    </select>
+
+    <a href="wishlist.html">Wishlist❤️</a>
+  </div>
+
+  <div id="productsContainer" class="products-grid"></div>
+
+  <script src="/js/customer/products.js"></script>
+
+</body>
+
 </html>

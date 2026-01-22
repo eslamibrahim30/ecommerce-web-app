@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>register</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <script type="module" src="/js/shared/auth.js" defer></script>
+  </head>
+  <body style="display: none;">
+    <div class="container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80vh;">
+      <form id="registerform">
+        <h2 style="text-align: center;">Register</h2>
+        <label for="email">E-mail</label>
+        <input type="email" name="email" id="registeremail" placeholder="Enter your email" required>
+
+        <label for="pass">Password</label>
+        <input type="password" name="pass" id="pass" placeholder="Password" required>
+
+        <label for="repeatpass">Repeat Password</label>
+        <input type="password" name="repeatpass" id="repeatpass" placeholder="Repeat Password" required>
+        
+        <button id="register" type="submit">Register</button>
+        <p id="error" style="height: 1rem;"></p>
+        <div style="text-align: center; margin-top: 10px;">
+          Already have an account? <a href="login.html">Login here</a>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

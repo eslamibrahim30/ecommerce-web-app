@@ -1,4 +1,4 @@
-// Firebase App // Import the functions you need from the SDKs you need
+// Firebase App
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 // Firebase Auth
@@ -6,6 +6,8 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // Firestore
@@ -32,76 +34,173 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // =====================
+// Auth State Observer
+// =====================
+onAuthStateChanged(auth, async (user) => {
+  const path = window.location.pathname;
+  const isAuthPage = path.includes("login.html") || path.includes("register.html");
+  const isAdminPage = path.includes("admin.html");
+
+  if (user) {
+    // User is signed in
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    const userData = userDoc.data();
+    
+    if (isAuthPage) {
+      if (userData?.role === "admin") {
+        window.location.href = "admin.html";
+      } else {
+        window.location.href = "index.html";
+      }
+    }
+
+    if (isAdminPage && userData?.role !== "admin") {
+      window.location.href = "index.html";
+      return; // Stop execution
+    }
+
+    // Update UI if elements exist
+    const userEmailEl = document.getElementById("user-email");
+    const logoutBtn = document.getElementById("logout-btn");
+    const loginLink = document.getElementById("login-nav-link");
+    const adminLink = document.getElementById("admin-link");
+
+    if (userEmailEl) userEmailEl.textContent = user.email;
+    if (logoutBtn) logoutBtn.style.display = "inline-block";
+    if (loginLink) loginLink.style.display = "none";
+
+    if (adminLink) {
+      if (userData?.role === "admin") {
+        adminLink.style.display = "inline-block";
+      } else {
+        adminLink.style.display = "none";
+      }
+    }
+  } else {
+    // User is signed out
+    const userEmailEl = document.getElementById("user-email");
+    const logoutBtn = document.getElementById("logout-btn");
+    const loginLink = document.getElementById("login-nav-link");
+    const adminLink = document.getElementById("admin-link");
+
+    if (userEmailEl) userEmailEl.textContent = "";
+    if (logoutBtn) logoutBtn.style.display = "none";
+    if (loginLink) loginLink.style.display = "inline-block";
+    if (adminLink) adminLink.style.display = "none";
+
+    if (!isAuthPage && path !== "/" && !path.endsWith("index.html")) {
+      // If on a protected page (like admin), redirect to login
+      if (isAdminPage) {
+        window.location.href = "login.html";
+        return;
+      }
+    }
+  }
+});
+
+// Function to check if user is logged in (returning a promise)
+export function checkUserLogin() {
+  return new Promise((resolve) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      unsubscribe();
+      resolve(user);
+    });
+  });
+}
+
+// Simple boolean check
+export async function isLoggedIn() {
+  const user = await checkUserLogin();
+  return !!user;
+}
+
+// Get user role
+export async function getUserRole() {
+  const user = await checkUserLogin();
+  if (!user) return null;
+  const userDoc = await getDoc(doc(db, "users", user.uid));
+  return userDoc.exists() ? userDoc.data().role : null;
+}
+
+// =====================
+// Logout Logic
+// =====================
+async function logout() {
+  try {
+    await signOut(auth);
+    window.location.href = "login.html";
+  } catch (error) {
+    console.error("Logout Error:", error.message);
+  }
+}
+
+// Expose logout to window for easy access in HTML
+window.logout = logout;
+
+// =====================
 // DOM Elements
 // =====================
-const form = document.querySelector("form");
-const emailInput = document.getElementById("email");
+// Note: getElementById does NOT use the "#" symbol
+const registerForm = document.getElementById("registerform");
+const loginForm = document.getElementById("loginform"); 
 const passInput = document.getElementById("pass");
 const repeatPassInput = document.getElementById("repeatpass");
 const errorBox = document.getElementById("error");
 
-
-
 // =====================
-// Register
+// Register Logic
 // =====================
 async function register(email, password) {
   try {
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password,
-    );
-    console.log("userCredential", userCredential);
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
+
     // Save user in Firestore
     await setDoc(doc(db, "users", user.uid), {
       email: user.email,
       role: "user",
       createdAt: new Date(),
     });
-    // console.log("User Registered:", user.uid);
+
     window.location.href = "index.html";
   } catch (error) {
+    if (errorBox) errorBox.textContent = error.message;
     console.error("Register Error:", error.message);
   }
 }
 
-
-
 // =====================
-// Login
+// Login Logic
 // =====================
 async function login(email, password) {
   try {
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password,
-    );
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
-    const userDoc = await getDoc(doc(db, "users", user.uid));
-    const role = userDoc.data().role;
     
-
-    if (role === "admin") {
-      window.location.href = "admin.html";
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    
+    if (userDoc.exists()) {
+      const role = userDoc.data().role;
+      if (role === "admin") {
+        window.location.href = "admin.html";
+      } else {
+        window.location.href = "index.html";
+      }
     } else {
-      console.log("Logged In:", userCredential.user.email);
-      window.location.href = "home.html";
+      window.location.href = "index.html";
     }
-
   } catch (error) {
+    if (errorBox) errorBox.textContent = "Invalid email or password";
     console.error("Login Error:", error.message);
   }
 }
 
-
-
 // =====================
-// Clear error while typing
+// Event Listeners
 // =====================
-passInput.addEventListener("input", () => {
+
+// Clear error while typing (using optional chaining ?. to prevent null errors)
+passInput?.addEventListener("input", () => {
   if (errorBox) errorBox.textContent = "";
 });
 
@@ -109,39 +208,26 @@ repeatPassInput?.addEventListener("input", () => {
   if (errorBox) errorBox.textContent = "";
 });
 
-
-
-// =====================
-// Handle Form Submit
-// =====================
-form.addEventListener("submit", function (e) {
+// Handle Register Form
+registerForm?.addEventListener("submit", (e) => {
   e.preventDefault();
+  const email = document.getElementById("registeremail")?.value.trim();
+  const password = passInput.value;
+  const repeatPass = repeatPassInput.value;
 
-  const emailInput = document.getElementById("email");
+  if (password !== repeatPass) {
+    errorBox.textContent = "Passwords do not match";
+    return;
+  }
 
-  const email = emailInput.value.trim();
+  register(email, password);
+});
+
+// Handle Login Form
+loginForm?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const email = document.getElementById("email")?.value.trim();
   const password = passInput.value;
 
-  // 🟢 REGISTER PAGE
-  if (repeatPassInput) {
-    const repeatPass = repeatPassInput.value;
-
-    if (!password || !repeatPass) {
-      errorBox.textContent = "Password fields cannot be empty";
-      return;
-    }
-
-    if (password !== repeatPass) {
-      errorBox.textContent = "Passwords do not match";
-      return;
-    }
-
-    errorBox.textContent = "";
-    register(email, password);
-  }
-
-  // 🔵 LOGIN PAGE
-  else {
-    login(email, password);
-  }
+  login(email, password);
 });
