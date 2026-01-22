@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart | E-Shop</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav id="customer-nav">
+        <div class="nav-container">
+            <div class="logo">E-SHOP</div>
+            <ul>
+                <li><a href="home.html">Home</a></li>
+                <li><a href="cart.html" class="active">Cart</a></li>
+                <li><a href="orders.html">Orders</a></li>
+                <li><a href="wishlist.html">Wishlist</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="content-wrapper">
+        <header id="customer-orders-header">
+            <h1>Shopping Cart</h1>
+        </header>
+
+        <div class="cart-layout">
+            <div class="cart-items-container" id="cart-items-list">
+                </div>
+
+            <div class="cart-summary-card">
+                <h3>Order Summary</h3>
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="subtotal">$0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span id="shipping">Free</span>
+                </div>
+                <hr class="summary-divider">
+                <div class="summary-row total">
+                    <span>Total</span>
+                    <span id="grand-total">$0.00</span>
+                </div>
+                <button class="btn-checkout" id="checkout-btn">Proceed to Checkout</button>
+                <a href="home.html" class="continue-shopping">Continue Shopping</a>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/customer/cart.js"></script>
+</body>
+</html>

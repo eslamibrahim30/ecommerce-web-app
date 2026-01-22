@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>My Orders | E-Shop</title>
+	<link rel="stylesheet" href="../css/main.css">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+	<nav id="customer-nav">
+		<div class="nav-container">
+			<div class="logo">E-SHOP</div>
+			<ul>
+				<li><a href="home.html">Home</a></li>
+				<li><a href="cart.html">Cart</a></li>
+				<li><a href="orders.html" class="active">Orders</a></li>
+				<li><a href="wishlist.html">Wishlist</a></li>
+			</ul>
+		</div>
+	</nav>
+
+	<main class="content-wrapper">
+		<header id="customer-orders-header">
+			<h1>My Orders</h1>
+			<p>View your history and track current shipments.</p>
+		</header>
+
+		<div class="orders-card">
+			<table class="orders-table">
+				<thead>
+					<tr>
+						<th>Order ID</th>
+						<th>Date</th>
+						<th>Total</th>
+						<th>Status</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody id="customer-orders-body">
+				</tbody>
+			</table>
+		</div>
+	</main>
+
+	<script type="module" src="../js/customer/orders.js"></script>
+</body>
+</html>
