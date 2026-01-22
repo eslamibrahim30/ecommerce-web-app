@@ -1,96 +1,58 @@
-const products = [
-    {
-        id: 1,
-        name: "Laptop",
-        description: "High performance laptop",
-        price: 15000,
-        category: "Electronics",
-        image: "/images/1.jpg"
-    },
-    {
-        id: 2,
-        name: "Smartphone",
-        description: "Latest mobile phone",
-        price: 8000,
-        category: "Electronics",
-        image: "/images/2.1.jpeg"
-    },
-    {
-        id: 3,
-        name: "Headphones",
-        description: "Wireless headphones",
-        price: 1200,
-        category: "Electronics",
-        image: "/images/3.1.jpg"
-    },
-    {
-        id: 4,
-        name: "T-Shirt",
-        description: "Cotton t-shirt",
-        price: 250,
-        category: "Clothes",
-        image: "/images/4.webp"
-    },
-    {
-        id: 5,
-        name: "Jeans",
-        description: "Blue jeans pants",
-        price: 600,
-        category: "Clothes",
-        image: "/images/5.webp"
-    },
-    {
-        id: 6,
-        name: "Jacket",
-        description: "Winter jacket",
-        price: 1200,
-        category: "Clothes",
-        image: "/images/6.jfif"
-    },
-    {
-        id: 7,
-        name: "Book A",
-        description: "Interesting novel",
-        price: 100,
-        category: "Books",
-        image: "/images/7.jpg"
-    },
-    {
-        id: 8,
-        name: "Book B",
-        description: "Science book",
-        price: 150,
-        category: "Books",
-        image: "/images/8.jfif"
-    },
-    {
-        id: 9,
-        name: "Book C",
-        description: "Programming guide",
-        price: 200,
-        category: "Books",
-        image: "/images/9.jpg"
-    },
-    
-];
+import { db } from "../shared/auth.js";
+import {
+    collection,
+    getDocs,
+    query,
+    orderBy
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+let products = [];
+
+async function fetchProducts() {
+    try {
+        const productsCol = collection(db, "products");
+        const q = query(productsCol, orderBy("name"));
+        const querySnapshot = await getDocs(q);
+
+        products = [];
+        querySnapshot.forEach((doc) => {
+            products.push({ id: doc.id, ...doc.data() });
+        });
+
+        displayProducts(products);
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        document.getElementById("productsContainer").innerHTML = "<p>Error loading products.</p>";
+    }
+}
 
 function displayProducts(list) {
     const container = document.getElementById("productsContainer");
     container.innerHTML = "";
 
-    list.forEach(product => {
-        container.innerHTML += `
-            <div class="product-card">
-                <img src="${product.image}" onclick="openProduct(${product.id})">
-                <h3>${product.name}</h3>
-                <p>${product.description}</p>
-                <p>${product.price} EGP</p>
+    if (list.length === 0) {
+        container.innerHTML = "<p>No products found.</p>";
+        return;
+    }
 
-                <button onclick="addToWishlist(${product.id})">
-                    Add to Wishlist
-                </button>
-            </div>
+    list.forEach(product => {
+        const productDiv = document.createElement("div");
+        productDiv.className = "product-card";
+        productDiv.innerHTML = `
+            <img src="${product.image || '/images/default-product.jpg'}" alt="${product.name}">
+            <h3>${product.name}</h3>
+            <p>${product.description}</p>
+            <p><strong>${product.price} EGP</strong></p>
+
+            <button class="wishlist-btn">
+                Add to Wishlist
+            </button>
         `;
+
+        productDiv.querySelector("img").onclick = () => openProduct(product.id);
+        productDiv.querySelector(".wishlist-btn").onclick = () => addToWishlist(product.id);
+
+        container.appendChild(productDiv);
     });
 }
 
@@ -100,7 +62,6 @@ function openProduct(id) {
 
 function addToWishlist(id) {
     let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-
     const product = products.find(p => p.id === id);
 
     if (!wishlist.some(item => item.id === id)) {
@@ -112,19 +73,17 @@ function addToWishlist(id) {
     }
 }
 
+// Search and Filter Listeners
 document.getElementById("searchInput").addEventListener("input", function () {
     const value = this.value.toLowerCase();
-
     const filtered = products.filter(p =>
         p.name.toLowerCase().includes(value)
     );
-
     displayProducts(filtered);
 });
 
 document.getElementById("categoryFilter").addEventListener("change", function () {
     const category = this.value;
-
     if (category === "all") {
         displayProducts(products);
     } else {
@@ -133,4 +92,5 @@ document.getElementById("categoryFilter").addEventListener("change", function ()
     }
 });
 
-displayProducts(products);
+// Initial Fetch
+fetchProducts();

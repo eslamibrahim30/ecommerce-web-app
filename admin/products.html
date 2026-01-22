@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Products - My Store Admin</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/products.css">
+  <script type="module" src="/js/shared/auth.js" defer></script>
+</head>
+
+<body>
+  <nav>
+    <a href="/index.html" class="nav-brand">My Store Admin</a>
+    <div class="nav-links">
+      <a href="/index.html" class="nav-link">Home</a>
+      <a href="/admin/dashboard.html" class="nav-link">Dashboard</a>
+      <a href="/admin/products.html" class="nav-link active">Products</a>
+      <a href="/admin/categories.html" class="nav-link">Categories</a>
+      <a href="/admin/orders.html" class="nav-link">Orders</a>
+      <div id="auth-section" class="flex items-center gap-2">
+        <span id="user-email" class="nav-link" style="font-weight: 700;"></span>
+        <button id="logout-btn" onclick="logout()" class="secondary" style="padding: 0.5rem 1rem;">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <header class="flex justify-between items-center mb-4">
+      <h1>Manage Products</h1>
+      <button id="add-product-btn" class="primary">Add New Product</button>
+    </header>
+
+    <div class="card overflow-x">
+      <table id="products-table">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price (EGP)</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="products-tbody">
+          <!-- Products will be injected here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Product Modal -->
+  <div id="product-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h2 id="modal-title">Add Product</h2>
+      <form id="product-form">
+        <input type="hidden" id="product-id">
+        <div class="form-group">
+          <label for="name">Product Name</label>
+          <input type="text" id="name" required>
+        </div>
+        <div class="form-group">
+          <label for="description">Description</label>
+          <input type="text" id="description" required>
+        </div>
+        <div class="form-group">
+          <label for="price">Price (EGP)</label>
+          <input type="number" id="price" required min="0">
+        </div>
+        <div class="form-group">
+          <label for="category">Category</label>
+          <select id="category" required>
+            <option value="Electronics">Electronics</option>
+            <option value="Clothes">Clothes</option>
+            <option value="Books">Books</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="image">Image URL</label>
+          <input type="text" id="image" required value="/images/default-product.jpg">
+        </div>
+        <button type="submit" class="primary">Save Product</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="/js/admin/products.js"></script>
+</body>
+
+</html>
