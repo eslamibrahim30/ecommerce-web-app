@@ -41,8 +41,8 @@ onAuthStateChanged(auth, async (user) => {
   
   // Route detection
   const isAuthPage = path.includes("auth/login.html") || path.includes("auth/register.html");
-  const isAdminPage = path.includes("admin.html") || path.includes("/admin/");
-  const isWishlistPage = path.includes("wishlist.html");
+  const isAdminPage = path.includes("/admin/");
+  const isWishlistPage = path.includes("/customer/wishlist.html");
   const isProtectedPage = isAdminPage || isWishlistPage;
 
   // Prevent flicker on protected/auth transitions
@@ -57,7 +57,7 @@ onAuthStateChanged(auth, async (user) => {
       
       // Guest-only pages (Login/Register)
       if (isAuthPage) {
-        window.location.href = userData?.role === "admin" ? "/admin.html" : "/index.html";
+        window.location.href = userData?.role === "admin" ? "/admin/dashboard.html" : "/index.html";
         return;
       }
 
@@ -203,7 +203,7 @@ async function login(email, password) {
     if (userDoc.exists()) {
       const role = userDoc.data().role;
       if (role === "admin") {
-        window.location.href = "/admin.html";
+        window.location.href = "/admin/dashboard.html";
       } else {
         window.location.href = "/index.html";
       }
