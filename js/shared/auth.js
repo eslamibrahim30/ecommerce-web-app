@@ -38,46 +38,51 @@ const db = getFirestore(app);
 // =====================
 onAuthStateChanged(auth, async (user) => {
   const path = window.location.pathname;
+  
+  // Route detection
   const isAuthPage = path.includes("auth/login.html") || path.includes("auth/register.html");
-  const isAdminPage = path.includes("admin.html");
+  const isAdminPage = path.includes("admin.html") || path.includes("/admin/");
+  const isWishlistPage = path.includes("wishlist.html");
+  const isProtectedPage = isAdminPage || isWishlistPage;
+
+  // Prevent flicker on protected/auth transitions
+  if (isProtectedPage || isAuthPage) {
+    document.body.style.opacity = "0";
+  }
 
   if (user) {
     try {
-      // User is signed in
-      const userDoc = await getDoc(doc(db, "users", user.uid));
+      const userDoc = await getDoc(doc(db, "users", user.uid)).catch(() => ({ exists: () => false }));
       const userData = userDoc.exists() ? userDoc.data() : null;
       
+      // Guest-only pages (Login/Register)
       if (isAuthPage) {
-        if (userData?.role === "admin") {
-          window.location.href = "/admin.html";
-        } else {
-          window.location.href = "/index.html";
-        }
-      }
-
-      if (isAdminPage && userData?.role !== "admin") {
-        window.location.href = "/index.html";
-        return; // Stop execution
-      }
-
-      // Update UI if elements exist
-      updateAuthUI(user, userData);
-    } catch (error) {
-      console.error("Firestore Permission Error:", error.message);
-      // Even if firestore fails, we can show basic user info from auth
-      updateAuthUI(user, null);
-    }
-  } else {
-    // User is signed out
-    updateAuthUI(null, null);
-
-    if (!isAuthPage && path !== "/" && !path.endsWith("index.html")) {
-      // If on a protected page (like admin), redirect to login
-      if (isAdminPage) {
-        window.location.href = "/auth/login.html";
+        window.location.href = userData?.role === "admin" ? "/admin.html" : "/index.html";
         return;
       }
+
+      // Admin verification
+      if (isAdminPage && userData?.role !== "admin") {
+        window.location.href = "/index.html";
+        return;
+      }
+
+      // Allow view & update UI
+      document.body.style.opacity = "1";
+      updateAuthUI(user, userData);
+    } catch (error) {
+      console.error("Route Protection Error:", error.message);
+      document.body.style.opacity = "1";
     }
+  } else {
+    // Guest User
+    if (isProtectedPage) {
+      window.location.href = "/auth/login.html";
+      return;
+    }
+
+    document.body.style.opacity = "1";
+    updateAuthUI(null, null);
   }
 });
 

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - My Store</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <script type="module" src="/js/shared/auth.js" defer></script>
+</head>
+
+<body>
+  <nav>
+    <a href="/index.html" class="nav-brand">My Store Admin</a>
+    <div class="nav-links">
+      <a href="/index.html" class="nav-link">Home</a>
+      <a href="/admin.html" class="nav-link">Dashboard</a>
+      <div id="auth-section" class="flex items-center gap-2">
+        <span id="user-email" class="nav-link" style="font-weight: 700;"></span>
+        <button id="logout-btn" onclick="logout()" class="secondary" style="padding: 0.5rem 1rem;">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <header class="mb-4">
+      <h1>Admin Dashboard</h1>
+    </header>
+
+    <div class="products-grid">
+      <div class="card">
+        <h3>Management</h3>
+        <div class="flex flex-col gap-2 mt-4">
+          <a href="/admin/products.html" class="nav-link">Manage Products</a>
+          <a href="/admin/categories.html" class="nav-link">Manage Categories</a>
+          <a href="/admin/orders.html" class="nav-link">View Orders</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Statistics</h3>
+        <div class="flex flex-col gap-2 mt-2">
+          <p>Total Sales: <strong>1,200 EGP</strong></p>
+          <p>Active Users: <strong>45</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
