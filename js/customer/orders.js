@@ -83,10 +83,10 @@ function renderOrders() {
             <td style="font-weight:600">#${order.id.substring(0, 8)}...</td>
             <td>${orderDate}</td>
             <td style="font-weight:600">${Number(order.total).toFixed(2)} EGP</td>
-            <td><span class="status element status-${order.status.toLowerCase()}">${order.status}</span></td>
+            <td><span class="status-badge status-${order.status.toLowerCase()}">${order.status}</span></td>
             <td>
                 <button class="btn-view" data-index="${index}">View Details</button>
-                ${order.status === 'Processing' ? `<button class="btn-cancel-link" data-id="${order.id}" data-index="${index}">Cancel</button>` : ''}
+                ${order.status === 'Processing' ? `<button class="btn-view destructive" data-id="${order.id}" data-index="${index}">Cancel</button>` : ''}
             </td>
         `;
     tbody.appendChild(tr);

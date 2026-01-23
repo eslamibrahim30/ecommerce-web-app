@@ -70,7 +70,7 @@ function renderOrders() {
                 <button class="btn-view" onclick="toggleDetails(${index})">View Details</button>
                 ${order.status === 'Processing' ? `
                     <button class="btn-view" style="background:#dcfce7; color:#166534; margin-left:5px;" onclick="confirmOrder('${order.id}', ${index})">Confirm</button>
-                    <button class="btn-cancel-link" onclick="cancelOrder('${order.id}', ${index})">Cancel</button>
+                    <button class="btn-view destructive" onclick="cancelOrder('${order.id}', ${index})">Cancel</button>
                 ` : ''}
             </td>
         `;
