@@ -1,5 +1,12 @@
 
-function getCart() {
+import { auth, db, checkUserLogin } from "../shared/auth.js";
+import {
+    collection,
+    addDoc,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+async function getCart() {
     const cart = localStorage.getItem('shopping_cart');
     return cart ? JSON.parse(cart) : [];
 }
@@ -9,15 +16,15 @@ function saveCart(cart) {
     renderCart();
 }
 
-function renderCart() {
-    const cart = getCart();
+async function renderCart() {
+    const cart = await getCart();
     const listContainer = document.getElementById('cart-items-list');
-    
+
     if (cart.length === 0) {
         listContainer.innerHTML = `
             <div style="padding: 40px; text-align: center;">
                 <p style="color: var(--text-muted);">Your cart is empty.</p>
-                <a href="home.html" style="color: var(--primary); font-weight: 600;">Go Shopping</a>
+                <a href="/index.html" style="color: var(--primary); font-weight: 600;">Go Shopping</a>
             </div>`;
         updateTotals(0);
         return;
@@ -25,28 +32,36 @@ function renderCart() {
 
     listContainer.innerHTML = cart.map((item, index) => `
         <div class="cart-item">
-            <div class="item-img"></div>
+            <img src="${item.image || '/images/default-product.jpg'}" alt="${item.name}" class="item-img" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
             <div class="item-info">
                 <h4>${item.name}</h4>
-                <div class="item-price">$${item.price.toFixed(2)}</div>
+                <div class="item-price">${Number(item.price).toFixed(2)} EGP</div>
             </div>
             <div class="item-controls">
-                <button class="qty-btn" onclick="updateQty(${index}, -1)">-</button>
+                <button class="qty-btn" style="color: var(--primary);" data-index="${index}" data-change="-1">-</button>
                 <span>${item.qty}</span>
-                <button class="qty-btn" onclick="updateQty(${index}, 1)">+</button>
-                <button class="btn-remove" onclick="removeItem(${index})">Remove</button>
+                <button class="qty-btn" style="color: var(--primary);" data-index="${index}" data-change="1">+</button>
+                <button class="btn-remove" data-index="${index}">Remove</button>
             </div>
         </div>
     `).join('');
+
+    // Re-attach event listeners since inline onclicks don't work well with modules
+    document.querySelectorAll('.qty-btn').forEach(btn => {
+        btn.onclick = () => updateQty(Number(btn.dataset.index), Number(btn.dataset.change));
+    });
+    document.querySelectorAll('.btn-remove').forEach(btn => {
+        btn.onclick = () => removeItem(Number(btn.dataset.index));
+    });
 
     const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
     updateTotals(total);
 }
 
-function updateQty(index, change) {
-    const cart = getCart();
+async function updateQty(index, change) {
+    const cart = await getCart();
     cart[index].qty += change;
-    
+
     if (cart[index].qty < 1) {
         removeItem(index);
     } else {
@@ -54,29 +69,65 @@ function updateQty(index, change) {
     }
 }
 
-function removeItem(index) {
-    const cart = getCart();
+async function removeItem(index) {
+    const cart = await getCart();
     cart.splice(index, 1);
     saveCart(cart);
 }
 
 function updateTotals(total) {
-    document.getElementById('subtotal').textContent = `$${total.toFixed(2)}`;
-    document.getElementById('grand-total').textContent = `$${total.toFixed(2)}`;
+    document.getElementById('subtotal').textContent = `${total.toFixed(2)} EGP`;
+    document.getElementById('grand-total').textContent = `${total.toFixed(2)} EGP`;
 }
 
-// Initial Data Seed (Only for testing if cart is empty)
-function seedTestItems() {
-    if (getCart().length === 0) {
-        const testItems = [
-            { id: 101, name: "Wireless Headphones", price: 149.99, qty: 1 },
-            { id: 102, name: "Phone Case", price: 37.50, qty: 2 }
-        ];
-        saveCart(testItems);
+async function checkout() {
+    const user = await checkUserLogin();
+    if (!user) {
+        alert("Please login to checkout.");
+        window.location.href = "/auth/login.html";
+        return;
+    }
+
+    const cart = await getCart();
+    if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+    }
+
+    const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+    const order = {
+        userId: user.uid,
+        userEmail: user.email,
+        items: cart,
+        total: total,
+        status: "Processing",
+        createdAt: serverTimestamp(),
+        date: new Date().toISOString(), // Fallback
+        shippingAddress: "123 Main St (Default)", // Placeholder as we don't have address form yet
+        paymentMethod: "Cash on Delivery"
+    };
+
+    try {
+        await addDoc(collection(db, "orders"), order);
+        localStorage.removeItem('shopping_cart');
+        alert("Order placed successfully!");
+        window.location.href = "orders.html";
+    } catch (error) {
+        console.error("Checkout Error:", error);
+        alert("Failed to place order. Please try again.");
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // seedTestItems();
+    // Make updateQty and removeItem global if needed, but better to attach listeners
+    // In modules, global scope is not window. 
+    // We attached listeners in renderCart.
+
     renderCart();
+
+    const checkoutBtn = document.getElementById('checkout-btn');
+    if (checkoutBtn) {
+        checkoutBtn.onclick = checkout;
+    }
 });

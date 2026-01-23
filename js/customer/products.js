@@ -58,6 +58,7 @@ function displayProducts(list) {
                 <div class="product-footer">
                     <div class="product-price">${product.price.toLocaleString()} <span class="currency">EGP</span></div>
                     <button class="wishlist-btn">Add ❤️</button>
+                    <button class="add-cart-btn primary" style="padding: 5px 10px; margin-left: 5px;">Cart 🛒</button>
                 </div>
             </div>
         `;
@@ -65,6 +66,7 @@ function displayProducts(list) {
         productDiv.querySelector(".product-image").onclick = () => openProduct(product.id);
         productDiv.querySelector(".wishlist-btn").onclick = () => addToWishlist(product.id);
         productDiv.querySelector(".wishlist-action").onclick = () => addToWishlist(product.id);
+        productDiv.querySelector(".add-cart-btn").onclick = () => addToCart(product.id);
 
         container.appendChild(productDiv);
     });
@@ -72,6 +74,30 @@ function displayProducts(list) {
 
 function openProduct(id) {
     window.location.href = "product.html?id=" + id;
+}
+
+function addToCart(id) {
+    let cart = JSON.parse(localStorage.getItem("shopping_cart")) || [];
+    const product = products.find(p => p.id === id);
+
+    // Check if item already exists
+    const existingItem = cart.find(item => item.id === id);
+
+    if (existingItem) {
+        existingItem.qty += 1;
+        alert("Quantity updated in cart");
+    } else {
+        cart.push({
+            id: product.id,
+            name: product.name,
+            price: Number(product.price),
+            image: product.image,
+            qty: 1
+        });
+        alert("Added to cart");
+    }
+
+    localStorage.setItem("shopping_cart", JSON.stringify(cart));
 }
 
 function addToWishlist(id) {

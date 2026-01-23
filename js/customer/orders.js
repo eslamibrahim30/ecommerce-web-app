@@ -1,20 +1,57 @@
+import { db, checkUserLogin } from "../shared/auth.js";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  doc,
+  updateDoc
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 // Global state to hold fetched orders
 let orders = [];
-
-// Orders CRUD
-
-const ordersRef = collection(db, "orders");
 
 /**
  * Initialization: Fetch data from Firestore and render
  */
 async function init() {
-  const tbody = document.getElementById('customer-orders-body');
+  const tbody = document.getElementById('orders-body');
+  if (!tbody) return; // Guard clause if element doesn't exist
+
   tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading orders...</td></tr>';
-  
-  orders = await getAllOrders();
+
+  const user = await checkUserLogin();
+  if (!user) {
+    window.location.href = "/auth/login.html";
+    return;
+  }
+
+  orders = await getAllOrders(user.uid);
   renderOrders();
+}
+
+/**
+ * Fetch Orders from Firestore
+ */
+async function getAllOrders(userId) {
+  try {
+    const q = query(
+      collection(db, "orders"),
+      where("userId", "==", userId),
+      orderBy("createdAt", "desc")
+    );
+
+    const querySnapshot = await getDocs(q);
+    const fetchedOrders = [];
+    querySnapshot.forEach((doc) => {
+      fetchedOrders.push({ id: doc.id, ...doc.data() });
+    });
+    return fetchedOrders;
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    return [];
+  }
 }
 
 /**
@@ -30,9 +67,9 @@ function renderOrders() {
   }
 
   orders.forEach((order, index) => {
-    // Handle Date: Firestore stores dates as Timestamps, static code uses strings
-    const orderDate = order.createdAt?.seconds 
-      ? new Date(order.createdAt.seconds * 1000).toLocaleDateString() 
+    // Handle Date
+    const orderDate = order.createdAt?.seconds
+      ? new Date(order.createdAt.seconds * 1000).toLocaleDateString()
       : new Date(order.date || Date.now()).toLocaleDateString();
 
     // Main Row
@@ -40,11 +77,11 @@ function renderOrders() {
     tr.innerHTML = `
             <td style="font-weight:600">#${order.id.substring(0, 8)}...</td>
             <td>${orderDate}</td>
-            <td style="font-weight:600">$${Number(order.total).toFixed(2)}</td>
-            <td><span class="status-badge status-${order.status.toLowerCase()}">${order.status}</span></td>
+            <td style="font-weight:600">${Number(order.total).toFixed(2)} EGP</td>
+            <td><span class="status element status-${order.status.toLowerCase()}">${order.status}</span></td>
             <td>
-                <button class="btn-view" onclick="toggleDetails(${index})">View Details</button>
-                ${order.status === 'Processing' ? `<button class="btn-cancel-link" onclick="cancelOrder('${order.id}', ${index})">Cancel</button>` : ''}
+                <button class="btn-view" data-index="${index}">View Details</button>
+                ${order.status === 'Processing' ? `<button class="btn-cancel-link" data-id="${order.id}" data-index="${index}">Cancel</button>` : ''}
             </td>
         `;
     tbody.appendChild(tr);
@@ -54,12 +91,12 @@ function renderOrders() {
     detailsTr.id = `details-${index}`;
     detailsTr.style.display = 'none';
 
-    const itemsList = order.items.map(item => `
+    const itemsList = order.items ? order.items.map(item => `
             <div class="item-row" style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee;">
-                <span>${item.name} <strong>x${item.quantity}</strong></span>
-                <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                <span>${item.name} <strong>x${item.qty || item.quantity}</strong></span>
+                <span>${(item.price * (item.qty || item.quantity)).toFixed(2)} EGP</span>
             </div>
-        `).join('');
+        `).join('') : 'No items';
 
     detailsTr.innerHTML = `
             <td colspan="5">
@@ -71,40 +108,48 @@ function renderOrders() {
                     <hr>
                     <div class="detail-section">
                         <h4>Delivery Address</h4>
-                        <p>${order.shippingAddress}</p>
+                        <p>${order.shippingAddress || 'N/A'}</p>
                         ${order.trackingNumber ? `<p><strong>Tracking:</strong> ${order.trackingNumber}</p>` : ''}
                     </div>
                     <div class="detail-section">
                         <h4>Payment Details</h4>
                         <p>Method: ${order.paymentMethod}</p>
-                        <p>Status: <span style="color:green">Paid</span></p>
                     </div>
                 </div>
             </td>
         `;
     tbody.appendChild(detailsTr);
   });
+
+  // Attach Listeners
+  document.querySelectorAll('.btn-view').forEach(btn => {
+    btn.onclick = () => toggleDetails(btn.dataset.index);
+  });
+
+  document.querySelectorAll('.btn-cancel-link').forEach(btn => {
+    btn.onclick = () => cancelOrder(btn.dataset.id, Number(btn.dataset.index));
+  });
 }
 
 /**
  * Action: Toggle Detail Visibility
  */
-window.toggleDetails = function(index) {
+function toggleDetails(index) {
   const el = document.getElementById(`details-${index}`);
   if (el) {
     el.style.display = el.style.display === 'none' ? 'table-row' : 'none';
   }
-};
+}
 
 /**
  * Action: Cancel Order in Firebase
  */
-window.cancelOrder = async function(orderId, index) {
+async function cancelOrder(orderId, index) {
   if (confirm("Are you sure you want to cancel this order?")) {
     try {
       // Update Firebase
-      await updateOrder(orderId, { status: "Cancelled" });
-      
+      await updateDoc(doc(db, "orders", orderId), { status: "Cancelled" });
+
       // Update local state and UI
       orders[index].status = "Cancelled";
       renderOrders();
@@ -114,7 +159,7 @@ window.cancelOrder = async function(orderId, index) {
       alert("Could not cancel order. Please try again.");
     }
   }
-};
+}
 
 // Start the app
 document.addEventListener('DOMContentLoaded', init);
