@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Wishlist - My Store</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/home.css">
+  <script type="module" src="/js/shared/auth.js" defer></script>
+</head>
+
+<body>
+  <nav>
+    <a href="/index.html" class="nav-brand">My Store</a>
+    <div class="nav-links">
+      <a href="/index.html" class="nav-link">🏠 Home</a>
+      <a href="/customer/wishlist.html" class="nav-link active">Wishlist ❤️</a>
+      <div id="auth-section" class="flex items-center gap-2">
+        <span id="user-email" class="nav-link" style="font-weight: 700;"></span>
+        <button id="logout-btn" onclick="logout()" class="secondary sm" style="display: none;">Logout</button>
+        <a href="/auth/login.html" id="login-nav-link" class="nav-link" style="display: none;">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- Page Header -->
+    <header class="page-header flex justify-between items-center mb-6">
+      <div>
+        <h1 class="page-title">Your Wishlist ❤️</h1>
+        <p class="page-subtitle">Items you've saved for later</p>
+      </div>
+      <a href="/index.html" class="btn secondary">← Back to Store</a>
+    </header>
+
+    <!-- Wishlist Grid -->
+    <div id="wishlistContainer" class="products-grid animate-fadeIn">
+      <!-- Wishlist items will be rendered here by JS -->
+    </div>
+
+    <!-- Empty State (shown when no items) -->
+    <div id="emptyState" class="empty-state" style="display: none;">
+      <div class="empty-state-icon">💔</div>
+      <h3 class="empty-state-title">Your wishlist is empty</h3>
+      <p class="empty-state-text">Looks like you haven't saved any items yet. Start exploring!</p>
+      <a href="/index.html" class="btn">Browse Products</a>
+    </div>
+  </div>
+
+  <script src="/js/customer/wishlist.js"></script>
+</body>
+
+</html>

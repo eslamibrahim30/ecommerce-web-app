@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register - My Store</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <script type="module" src="/js/shared/auth.js" defer></script>
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, hsl(var(--secondary-100)) 0%, hsl(var(--primary-100)) 100%);
+      padding: 2rem;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 400px;
+    }
+    .auth-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .auth-logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, hsl(var(--primary-600)), hsl(var(--primary-500)));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+    .auth-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: hsl(var(--secondary-900));
+      margin: 0 0 0.25rem 0;
+    }
+    .auth-subtitle {
+      color: hsl(var(--secondary-500));
+      font-size: 0.9375rem;
+    }
+    .auth-form {
+      margin: 0;
+      max-width: 100%;
+    }
+    .auth-footer {
+      text-align: center;
+      padding-top: 1rem;
+      border-top: 1px solid hsl(var(--secondary-200));
+      color: hsl(var(--secondary-500));
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo">🛒 My Store</div>
+      </div>
+      
+      <form id="registerform" class="auth-form">
+        <h2 class="auth-title">Create an account</h2>
+        <p class="auth-subtitle">Join us and start shopping today</p>
+
+        <div class="form-group">
+          <label for="registeremail">Email Address</label>
+          <input type="email" name="email" id="registeremail" placeholder="you@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="pass">Password</label>
+          <input type="password" name="pass" id="pass" placeholder="Create a strong password" required>
+        </div>
+
+        <div class="form-group">
+          <label for="repeatpass">Confirm Password</label>
+          <input type="password" name="repeatpass" id="repeatpass" placeholder="Repeat your password" required>
+        </div>
+
+        <button id="register" type="submit" class="w-full mt-2">Create Account</button>
+        
+        <p id="error" class="error-message mt-3" style="display: none;"></p>
+
+        <div class="auth-footer mt-4">
+          Already have an account? <a href="/auth/login.html">Sign in</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+
+</html>

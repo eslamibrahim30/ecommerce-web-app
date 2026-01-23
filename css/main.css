@@ -1,3 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Master CSS file - Imports shared styles */
+@import url('shared/variables.css');
+@import url('shared/base.css');
+@import url('shared/layout.css');
+@import url('shared/components.css');
+
 :root {
 	--primary: #2563eb;
 	--primary-light: #eff6ff;

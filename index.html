@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Store - Home</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/home.css">
+</head>
+
+<body>
+  <nav>
+    <a href="/index.html" class="nav-brand">My Store</a>
+    <div class="nav-links">
+      <a href="/index.html" class="nav-link">Home</a>
+      <a href="/admin/dashboard.html" id="admin-link" class="nav-link" style="display: none;">Admin</a>
+      <a href="/customer/wishlist.html" class="nav-link">Wishlist ❤️</a>
+      <div id="auth-section" class="flex items-center gap-2">
+        <span id="user-email" class="nav-link" style="font-weight: 700;"></span>
+        <button id="logout-btn" onclick="logout()" class="secondary"
+          style="display: none; padding: 0.5rem 1rem;">Logout</button>
+        <a href="/auth/login.html" id="login-nav-link" class="nav-link" style="display: none;">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- Hero Section -->
+    <section class="hero mb-6">
+      <h1 class="hero-title">Discover Premium Products</h1>
+      <p class="hero-subtitle">Shop the latest electronics, fashion & books at unbeatable prices</p>
+    </section>
+
+    <!-- Search & Filter -->
+    <div class="card mb-6">
+      <div class="search-filter-container">
+        <input type="text" id="searchInput" placeholder="Search for products...">
+        <select id="categoryFilter">
+          <option value="all">All Categories</option>
+          <option value="Electronics">📱 Electronics</option>
+          <option value="Clothes">👕 Clothes</option>
+          <option value="Books">📚 Books</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div id="productsContainer" class="products-grid animate-fadeIn"></div>
+  </div>
+
+  <script type="module" src="/js/customer/products.js"></script>
+  <script type="module" src="/js/shared/auth.js" defer></script>
+
+</body>
+
+</html>
