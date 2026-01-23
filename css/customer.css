@@ -1,0 +1,226 @@
+/* ================= DESIGN SYSTEM ================= */
+:root {
+    --primary: #2563eb;
+    --primary-light: #eff6ff;
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+/* ================= RESET ================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ================= BODY ================= */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg);
+    color: var(--text-main);
+    padding-top: 80px;
+    line-height: 1.5;
+}
+/* ================= NAVBAR ================= */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 60px; 
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    z-index: 1000;
+}
+
+/* Left */
+.navbar h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary);
+    white-space: nowrap;
+}
+
+/* Center */
+.navbar-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+#searchInput {
+    width: 420px;
+    max-width: 100%;
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--primary-light);
+    outline: none;
+    transition: 0.3s;
+}
+
+#searchInput:focus {
+    border-color: var(--primary);
+    background: #fff;
+}
+
+/* Right */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#categoryFilter {
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: #fff;
+    cursor: pointer;
+}
+
+/* Wishlist */
+.navbar a {
+    text-decoration: none;
+    color: #fff;
+    background: var(--primary);
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 14px;
+    box-shadow: var(--shadow);
+    transition: 0.3s;
+}
+
+.navbar a:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+
+.navbar-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.nav-btn-outline {
+    background: transparent !important;
+    color: var(--primary) !important;
+    border: 1px solid var(--primary);
+}
+
+.nav-btn-outline:hover {
+    background: var(--primary) !important;
+    color: #fff !important;
+}
+
+
+
+/* ================= PRODUCTS GRID ================= */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 28px;
+    padding: 32px;
+}
+
+/* ================= PRODUCT CARD ================= */
+.product-card {
+    background: var(--surface);
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    padding: 16px;
+    text-align: center;
+    transition: 0.35s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-6px);
+}
+
+/* Image */
+.product-card img {
+    width: 100%;
+    height: 200px;
+    border-radius: 14px;
+    object-fit: cover;
+    transition: transform 0.35s ease;
+    cursor: pointer;
+}
+
+.product-card img:hover {
+    transform: scale(1.06);
+}
+
+/* Content */
+.product-card h3 {
+    margin-top: 14px;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.product-card p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin: 6px 0;
+}
+
+/* Price */
+.product-card p:last-of-type {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+/* ================= BUTTONS ================= */
+button {
+    margin-top: 12px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    border: none;
+    background: var(--primary);
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+/* ================= PRODUCT DETAILS ================= */
+#productDetails {
+    max-width: 900px;
+    margin: auto;
+    background: var(--surface);
+    padding: 32px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+}
+
+#productDetails img {
+    max-width: 100%;
+    border-radius: 18px;
+    display: block;
+    margin: 24px auto;
+}
+
+/* ================= BACK LINK ================= */
+a[href="home.html"] {
+    display: inline-block;
+    margin: 24px;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+}
