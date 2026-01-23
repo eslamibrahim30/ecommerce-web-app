@@ -86,7 +86,6 @@ function renderOrders() {
             <td><span class="status-badge status-${order.status.toLowerCase()}">${order.status}</span></td>
             <td>
                 <button class="btn-view" data-index="${index}">View Details</button>
-                ${order.status === 'Processing' ? `<button class="btn-view destructive" data-id="${order.id}" data-index="${index}">Cancel</button>` : ''}
             </td>
         `;
     tbody.appendChild(tr);
