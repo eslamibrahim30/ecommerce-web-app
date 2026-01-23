@@ -10,24 +10,13 @@
 <body>
     <nav>
         <a href="/index.html" class="nav-brand">My Store</a>
-        <div class="nav-links">
-            <a href="/index.html" class="nav-link">Home</a>
-            <a href="/admin/dashboard.html" id="admin-link" class="nav-link" style="display: none;">Admin</a>
-            <a href="/customer/wishlist.html" class="nav-link">Wishlist ❤️</a>
-            <a href="/customer/cart.html" class="nav-link">Cart 🛒</a>
-            <div id="auth-section" class="flex items-center gap-2">
-                <span id="user-email" class="nav-link" style="font-weight: 700;"></span>
-                <button id="logout-btn" onclick="logout()" class="secondary"
-                    style="display: none; padding: 0.5rem 1rem;">Logout</button>
-                <a href="/auth/login.html" id="login-nav-link" class="nav-link" style="display: none;">Login</a>
-            </div>
-        </div>
-        <div class="container">
-            <a href="/index.html" class="nav-link">⬅ Back to Home</a>
+    </nav>
+    <div class="container">
+        <a href="/index.html" class="nav-link">⬅ Back to Home</a>
 
-            <div id="productDetails"></div>
+        <div id="productDetails"></div>
 
-            <script type="module" src="/js/customer/productDtls.js"></script>
+        <script type="module" src="/js/customer/productDtls.js"></script>
 
 </body>
 

@@ -1,10 +1,11 @@
-import { collection, query, orderBy, onSnapshot } 
+import { collection, query, orderBy, onSnapshot, doc, updateDoc }
   from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
-import { db } from "../shared/firebase-config.js";
+import { db } from "../shared/auth.js";
 
 
 // Global state to hold fetched orders
 let orders = [];
+let unsubscribe = null;
 
 // Orders CRUD
 
@@ -14,18 +15,37 @@ const ordersRef = collection(db, "orders");
  * Initialization: Fetch data from Firestore and render
  */
 async function init() {
-  const tbody = document.getElementById('orders-body');
+  const tbody = document.getElementById('admin-orders-body');
   tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading orders...</td></tr>';
-  
-  orders = await getAllOrders();
-  renderOrders();
+
+  subscribeToOrders();
+}
+
+function subscribeToOrders() {
+  // Admin sees ALL orders
+  const q = query(ordersRef, orderBy("createdAt", "desc"));
+
+  if (unsubscribe) {
+    unsubscribe();
+  }
+
+  unsubscribe = onSnapshot(q, (snapshot) => {
+    orders = [];
+    snapshot.forEach(doc => {
+      orders.push({ id: doc.id, ...doc.data() });
+    });
+    renderOrders();
+  }, (error) => {
+    console.error("Error fetching admin orders:", error);
+    document.getElementById('admin-orders-body').innerHTML = '<tr><td colspan="5" style="text-align:center;">Error loading orders.</td></tr>';
+  });
 }
 
 /**
  * Main Render Function
  */
 function renderOrders() {
-  const tbody = document.getElementById('orders-body');
+  const tbody = document.getElementById('admin-orders-body');
   tbody.innerHTML = '';
 
   if (!orders || orders.length === 0) {
@@ -35,8 +55,8 @@ function renderOrders() {
 
   orders.forEach((order, index) => {
     // Handle Date: Firestore stores dates as Timestamps, static code uses strings
-    const orderDate = order.createdAt?.seconds 
-      ? new Date(order.createdAt.seconds * 1000).toLocaleDateString() 
+    const orderDate = order.createdAt?.seconds
+      ? new Date(order.createdAt.seconds * 1000).toLocaleDateString()
       : new Date(order.date || Date.now()).toLocaleDateString();
 
     // Main Row
@@ -93,7 +113,7 @@ function renderOrders() {
 /**
  * Action: Toggle Detail Visibility
  */
-window.toggleDetails = function(index) {
+window.toggleDetails = function (index) {
   const el = document.getElementById(`details-${index}`);
   if (el) {
     el.style.display = el.style.display === 'none' ? 'table-row' : 'none';
@@ -103,12 +123,12 @@ window.toggleDetails = function(index) {
 /**
  * Action: Cancel Order in Firebase
  */
-window.cancelOrder = async function(orderId, index) {
+window.cancelOrder = async function (orderId, index) {
   if (confirm("Are you sure you want to cancel this order?")) {
     try {
       // Update Firebase
       await updateOrder(orderId, { status: "Cancelled" });
-      
+
       // Update local state and UI
       orders[index].status = "Cancelled";
       renderOrders();

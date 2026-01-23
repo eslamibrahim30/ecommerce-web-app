@@ -7,7 +7,8 @@ import {
   deleteDoc,
   doc,
   query,
-  orderBy
+  orderBy,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 // DOM Elements
@@ -174,5 +175,40 @@ productForm.addEventListener("submit", async (e) => {
   closeModal();
 });
 
+// Categories Logic
+function populateCategories() {
+  const categorySelect = document.getElementById("category");
+  const categoriesRef = collection(db, "categories");
+  const q = query(categoriesRef, orderBy("name"));
+
+  onSnapshot(q, (snapshot) => {
+    const categories = [];
+    snapshot.forEach((doc) => {
+      categories.push({ id: doc.id, ...doc.data() });
+    });
+
+    // Save current selection if any
+    const currentVal = categorySelect.value;
+
+    // Clear and add default
+    categorySelect.innerHTML = '<option value="">Select a category</option>';
+
+    categories.forEach(cat => {
+      const option = document.createElement("option");
+      option.value = cat.name; // Storing name as value based on current usage
+      option.textContent = cat.name; // You might want to show description or icon too?
+      categorySelect.appendChild(option);
+    });
+
+    // Restore selection if it still exists
+    if (categories.some(c => c.name === currentVal)) {
+      categorySelect.value = currentVal;
+    }
+  }, (error) => {
+    console.error("Error fetching categories:", error);
+  });
+}
+
 // Initial Render
+populateCategories();
 fetchAndRenderProducts();

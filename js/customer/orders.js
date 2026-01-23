@@ -1,22 +1,23 @@
 import { db, checkUserLogin } from "../shared/auth.js";
 import {
   collection,
-  getDocs,
   query,
   where,
   orderBy,
   doc,
-  updateDoc
+  updateDoc,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 // Global state to hold fetched orders
 let orders = [];
+let unsubscribe = null;
 
 /**
  * Initialization: Fetch data from Firestore and render
  */
 async function init() {
-  const tbody = document.getElementById('orders-body');
+  const tbody = document.getElementById('customer-orders-body');
   if (!tbody) return; // Guard clause if element doesn't exist
 
   tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading orders...</td></tr>';
@@ -27,38 +28,42 @@ async function init() {
     return;
   }
 
-  orders = await getAllOrders(user.uid);
-  renderOrders();
+  // Subscribe to real-time updates
+  subscribeToOrders(user.uid);
 }
 
 /**
- * Fetch Orders from Firestore
+ * Subscribe to Orders from Firestore
  */
-async function getAllOrders(userId) {
-  try {
-    const q = query(
-      collection(db, "orders"),
-      where("userId", "==", userId),
-      orderBy("createdAt", "desc")
-    );
+function subscribeToOrders(userId) {
+  const q = query(
+    collection(db, "orders"),
+    where("userId", "==", userId),
+    orderBy("createdAt", "desc")
+  );
 
-    const querySnapshot = await getDocs(q);
-    const fetchedOrders = [];
-    querySnapshot.forEach((doc) => {
-      fetchedOrders.push({ id: doc.id, ...doc.data() });
-    });
-    return fetchedOrders;
-  } catch (error) {
-    console.error("Error fetching orders:", error);
-    return [];
+  if (unsubscribe) {
+    unsubscribe();
   }
+
+  unsubscribe = onSnapshot(q, (querySnapshot) => {
+    orders = [];
+    querySnapshot.forEach((doc) => {
+      orders.push({ id: doc.id, ...doc.data() });
+    });
+    renderOrders();
+  }, (error) => {
+    console.error("Error fetching orders:", error);
+    const tbody = document.getElementById('customer-orders-body');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Error loading orders.</td></tr>';
+  });
 }
 
 /**
  * Main Render Function
  */
 function renderOrders() {
-  const tbody = document.getElementById('orders-body');
+  const tbody = document.getElementById('customer-orders-body');
   tbody.innerHTML = '';
 
   if (!orders || orders.length === 0) {
