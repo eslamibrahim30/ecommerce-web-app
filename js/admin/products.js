@@ -151,12 +151,33 @@ productForm.addEventListener("submit", async (e) => {
 
   const productId = document.getElementById("product-id").value;
   const productData = {
-    name: document.getElementById("name").value,
-    description: document.getElementById("description").value,
+    name: document.getElementById("name").value.trim(),
+    description: document.getElementById("description").value.trim(),
     price: parseFloat(document.getElementById("price").value),
     category: document.getElementById("category").value,
-    image: document.getElementById("image").value
+    image: document.getElementById("image").value.trim()
   };
+
+  // Validation
+  if (!productData.name || !productData.price || !productData.category) {
+    alert("Please fill in all required fields.");
+    return;
+  }
+
+  if (productData.price <= 0) {
+    alert("Price must be greater than 0.");
+    return;
+  }
+
+  // Check for duplicates (exclude current product if editing)
+  const isDuplicate = products.some(p =>
+    p.name.toLowerCase() === productData.name.toLowerCase() && p.id !== productId
+  );
+
+  if (isDuplicate) {
+    alert("A product with this name already exists.");
+    return;
+  }
 
   // Show loading state on button
   const submitBtn = productForm.querySelector("button[type='submit']");

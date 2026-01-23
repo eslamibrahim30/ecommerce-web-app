@@ -148,9 +148,24 @@ categoryForm.addEventListener("submit", async (e) => {
 
     const categoryId = document.getElementById("category-id").value;
     const categoryData = {
-        name: document.getElementById("name").value,
-        description: document.getElementById("description").value
+        name: document.getElementById("name").value.trim(),
+        description: document.getElementById("description").value.trim()
     };
+
+    if (!categoryData.name) {
+        alert("Category Name is required.");
+        return;
+    }
+
+    // Check for duplicates (exclude current category if editing)
+    const isDuplicate = categories.some(c =>
+        c.name.toLowerCase() === categoryData.name.toLowerCase() && c.id !== categoryId
+    );
+
+    if (isDuplicate) {
+        alert("A category with this name already exists.");
+        return;
+    }
 
     const submitBtn = categoryForm.querySelector("button[type='submit']");
     const originalText = submitBtn.textContent;

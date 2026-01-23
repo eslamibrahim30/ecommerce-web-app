@@ -57,14 +57,12 @@ function displayProducts(list) {
                 <p class="product-description">${product.description || ''}</p>
                 <div class="product-footer">
                     <div class="product-price">${product.price.toLocaleString()} <span class="currency">EGP</span></div>
-                    <button class="wishlist-btn">Add ❤️</button>
                     <button class="add-cart-btn primary" style="padding: 5px 10px; margin-left: 5px;">Cart 🛒</button>
                 </div>
             </div>
         `;
 
         productDiv.querySelector(".product-image").onclick = () => openProduct(product.id);
-        productDiv.querySelector(".wishlist-btn").onclick = () => addToWishlist(product.id);
         productDiv.querySelector(".wishlist-action").onclick = () => addToWishlist(product.id);
         productDiv.querySelector(".add-cart-btn").onclick = () => addToCart(product.id);
 
