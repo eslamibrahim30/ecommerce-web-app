@@ -68,7 +68,10 @@ function renderOrders() {
             <td><span class="status-badge status-${order.status.toLowerCase()}">${order.status}</span></td>
             <td>
                 <button class="btn-view" onclick="toggleDetails(${index})">View Details</button>
-                ${order.status === 'Processing' ? `<button class="btn-cancel-link" onclick="cancelOrder('${order.id}', ${index})">Cancel</button>` : ''}
+                ${order.status === 'Processing' ? `
+                    <button class="btn-view" style="background:#dcfce7; color:#166534; margin-left:5px;" onclick="confirmOrder('${order.id}', ${index})">Confirm</button>
+                    <button class="btn-cancel-link" onclick="cancelOrder('${order.id}', ${index})">Cancel</button>
+                ` : ''}
             </td>
         `;
     tbody.appendChild(tr);
@@ -121,13 +124,33 @@ window.toggleDetails = function (index) {
 };
 
 /**
+ * Action: Confirm Order (Processing -> Shipped)
+ */
+window.confirmOrder = async function (orderId, index) {
+  if (confirm("Are you sure you want to mark this order as Shipped?")) {
+    try {
+      // Update Firebase
+      await updateDoc(doc(db, "orders", orderId), { status: "Shipped" });
+
+      // Update local state and UI (optional as onSnapshot handles it, but good for feedback)
+      orders[index].status = "Shipped";
+      renderOrders();
+      alert("Order marked as Shipped.");
+    } catch (error) {
+      console.error("Confirmation failed:", error);
+      alert("Could not update order. Please try again.");
+    }
+  }
+};
+
+/**
  * Action: Cancel Order in Firebase
  */
 window.cancelOrder = async function (orderId, index) {
   if (confirm("Are you sure you want to cancel this order?")) {
     try {
       // Update Firebase
-      await updateOrder(orderId, { status: "Cancelled" });
+      await updateDoc(doc(db, "orders", orderId), { status: "Cancelled" });
 
       // Update local state and UI
       orders[index].status = "Cancelled";

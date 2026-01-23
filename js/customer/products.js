@@ -131,4 +131,25 @@ document.getElementById("categoryFilter").addEventListener("change", function ()
 });
 
 // Initial Fetch
+fetchCategories();
 fetchProducts();
+
+async function fetchCategories() {
+    try {
+        const categoriesCol = collection(db, "categories");
+        const q = query(categoriesCol, orderBy("name"));
+        const querySnapshot = await getDocs(q);
+
+        const filterSelect = document.getElementById("categoryFilter");
+
+        querySnapshot.forEach((doc) => {
+            const cat = doc.data();
+            const option = document.createElement("option");
+            option.value = cat.name;
+            option.textContent = cat.name; // Could add icon if stored: `${cat.icon || ''} ${cat.name}`
+            filterSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+    }
+}
