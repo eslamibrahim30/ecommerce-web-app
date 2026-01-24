@@ -7,7 +7,8 @@ import {
   deleteDoc,
   doc,
   query,
-  orderBy
+  orderBy,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 // DOM Elements
@@ -150,12 +151,33 @@ productForm.addEventListener("submit", async (e) => {
 
   const productId = document.getElementById("product-id").value;
   const productData = {
-    name: document.getElementById("name").value,
-    description: document.getElementById("description").value,
+    name: document.getElementById("name").value.trim(),
+    description: document.getElementById("description").value.trim(),
     price: parseFloat(document.getElementById("price").value),
     category: document.getElementById("category").value,
-    image: document.getElementById("image").value
+    image: document.getElementById("image").value.trim()
   };
+
+  // Validation
+  if (!productData.name || !productData.price || !productData.category) {
+    alert("Please fill in all required fields.");
+    return;
+  }
+
+  if (productData.price <= 0) {
+    alert("Price must be greater than 0.");
+    return;
+  }
+
+  // Check for duplicates (exclude current product if editing)
+  const isDuplicate = products.some(p =>
+    p.name.toLowerCase() === productData.name.toLowerCase() && p.id !== productId
+  );
+
+  if (isDuplicate) {
+    alert("A product with this name already exists.");
+    return;
+  }
 
   // Show loading state on button
   const submitBtn = productForm.querySelector("button[type='submit']");
@@ -174,5 +196,40 @@ productForm.addEventListener("submit", async (e) => {
   closeModal();
 });
 
+// Categories Logic
+function populateCategories() {
+  const categorySelect = document.getElementById("category");
+  const categoriesRef = collection(db, "categories");
+  const q = query(categoriesRef, orderBy("name"));
+
+  onSnapshot(q, (snapshot) => {
+    const categories = [];
+    snapshot.forEach((doc) => {
+      categories.push({ id: doc.id, ...doc.data() });
+    });
+
+    // Save current selection if any
+    const currentVal = categorySelect.value;
+
+    // Clear and add default
+    categorySelect.innerHTML = '<option value="">Select a category</option>';
+
+    categories.forEach(cat => {
+      const option = document.createElement("option");
+      option.value = cat.name; // Storing name as value based on current usage
+      option.textContent = cat.name; // You might want to show description or icon too?
+      categorySelect.appendChild(option);
+    });
+
+    // Restore selection if it still exists
+    if (categories.some(c => c.name === currentVal)) {
+      categorySelect.value = currentVal;
+    }
+  }, (error) => {
+    console.error("Error fetching categories:", error);
+  });
+}
+
 // Initial Render
+populateCategories();
 fetchAndRenderProducts();

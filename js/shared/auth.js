@@ -219,9 +219,24 @@ async function login(email, password) {
       window.location.href = "/index.html";
     }
   } catch (error) {
-    if (errorBox) errorBox.textContent = "Invalid email or password";
+    if (errorBox) {
+      errorBox.textContent = "Wrong email or password";
+      errorBox.style.display = "block";
+    }
     console.error("Login Error:", error.message);
   }
+}
+
+// =====================
+// Event Listeners
+// =====================
+
+// =====================
+// Helper: Validate Email
+// =====================
+function isValidEmail(email) {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
 }
 
 // =====================
@@ -244,8 +259,16 @@ registerForm?.addEventListener("submit", (e) => {
   const password = passInput.value;
   const repeatPass = repeatPassInput.value;
 
+  if (!isValidEmail(email)) {
+    if (errorBox) errorBox.textContent = "Not valid email";
+    return;
+  }
+
   if (password !== repeatPass) {
-    errorBox.textContent = "Passwords do not match";
+    if (errorBox) {
+      errorBox.textContent = "Password and password-repeat are not the same";
+      errorBox.style.display = "block";
+    }
     return;
   }
 
@@ -257,6 +280,11 @@ loginForm?.addEventListener("submit", (e) => {
   e.preventDefault();
   const email = document.getElementById("email")?.value.trim();
   const password = passInput.value;
+
+  if (!isValidEmail(email)) {
+    if (errorBox) errorBox.textContent = "Not valid email";
+    return;
+  }
 
   login(email, password);
 });

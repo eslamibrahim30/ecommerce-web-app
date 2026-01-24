@@ -16,6 +16,8 @@
       <a href="/index.html" class="nav-link">Home</a>
       <a href="/admin/dashboard.html" id="admin-link" class="nav-link" style="display: none;">Admin</a>
       <a href="/customer/wishlist.html" class="nav-link">Wishlist ❤️</a>
+      <a href="/customer/cart.html" class="nav-link">Cart 🛒</a>
+      <a href="/customer/orders.html" class="nav-link">Orders 📦</a>
       <div id="auth-section" class="flex items-center gap-2">
         <span id="user-email" class="nav-link" style="font-weight: 700;"></span>
         <button id="logout-btn" onclick="logout()" class="secondary"
@@ -26,11 +28,6 @@
   </nav>
 
   <div class="container">
-    <!-- Hero Section -->
-    <section class="hero mb-6">
-      <h1 class="hero-title">Discover Premium Products</h1>
-      <p class="hero-subtitle">Shop the latest electronics, fashion & books at unbeatable prices</p>
-    </section>
 
     <!-- Search & Filter -->
     <div class="card mb-6">
@@ -38,9 +35,6 @@
         <input type="text" id="searchInput" placeholder="Search for products...">
         <select id="categoryFilter">
           <option value="all">All Categories</option>
-          <option value="Electronics">📱 Electronics</option>
-          <option value="Clothes">👕 Clothes</option>
-          <option value="Books">📚 Books</option>
         </select>
       </div>
     </div>

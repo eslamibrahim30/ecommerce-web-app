@@ -57,21 +57,45 @@ function displayProducts(list) {
                 <p class="product-description">${product.description || ''}</p>
                 <div class="product-footer">
                     <div class="product-price">${product.price.toLocaleString()} <span class="currency">EGP</span></div>
-                    <button class="wishlist-btn">Add ❤️</button>
+                    <button class="add-cart-btn primary" style="padding: 5px 10px; margin-left: 5px;">Cart 🛒</button>
                 </div>
             </div>
         `;
 
         productDiv.querySelector(".product-image").onclick = () => openProduct(product.id);
-        productDiv.querySelector(".wishlist-btn").onclick = () => addToWishlist(product.id);
         productDiv.querySelector(".wishlist-action").onclick = () => addToWishlist(product.id);
+        productDiv.querySelector(".add-cart-btn").onclick = () => addToCart(product.id);
 
         container.appendChild(productDiv);
     });
 }
 
 function openProduct(id) {
-    window.location.href = "product.html?id=" + id;
+    window.location.href = "../customer/productDtls.html?id=" + id;
+}
+
+function addToCart(id) {
+    let cart = JSON.parse(localStorage.getItem("shopping_cart")) || [];
+    const product = products.find(p => p.id === id);
+
+    // Check if item already exists
+    const existingItem = cart.find(item => item.id === id);
+
+    if (existingItem) {
+        existingItem.qty += 1;
+        alert("Quantity updated in cart");
+    } else {
+        cart.push({
+            id: product.id,
+            name: product.name,
+            price: Number(product.price),
+            image: product.image,
+            qty: 1
+        });
+        alert("Added to cart");
+    }
+
+    localStorage.setItem("shopping_cart", JSON.stringify(cart));
 }
 
 function addToWishlist(id) {
@@ -107,4 +131,25 @@ document.getElementById("categoryFilter").addEventListener("change", function ()
 });
 
 // Initial Fetch
+fetchCategories();
 fetchProducts();
+
+async function fetchCategories() {
+    try {
+        const categoriesCol = collection(db, "categories");
+        const q = query(categoriesCol, orderBy("name"));
+        const querySnapshot = await getDocs(q);
+
+        const filterSelect = document.getElementById("categoryFilter");
+
+        querySnapshot.forEach((doc) => {
+            const cat = doc.data();
+            const option = document.createElement("option");
+            option.value = cat.name;
+            option.textContent = cat.name; // Could add icon if stored: `${cat.icon || ''} ${cat.name}`
+            filterSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+    }
+}

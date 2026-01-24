@@ -1,123 +1,101 @@
-const products = [
-    {
-        id: 1,
-        name: "Laptop",
-        description: "High performance laptop",
-        price: 15000,
-        category: "Electronics",
-        image: "/images/1.jpg"
-    },
-    {
-        id: 2,
-        name: "Smartphone",
-        description: "Latest mobile phone",
-        price: 8000,
-        category: "Electronics",
-        image: "/images/2.1.jpeg"
-    },
-    {
-        id: 3,
-        name: "Headphones",
-        description: "Wireless headphones",
-        price: 1200,
-        category: "Electronics",
-        image: "/images/3.1.jpg"
-    },
-    {
-        id: 4,
-        name: "T-Shirt",
-        description: "Cotton t-shirt",
-        price: 250,
-        category: "Clothes",
-        image: "/images/4.webp"
-    },
-    {
-        id: 5,
-        name: "Jeans",
-        description: "Blue jeans pants",
-        price: 600,
-        category: "Clothes",
-        image: "/images/5.webp"
-    },
-    {
-        id: 6,
-        name: "Jacket",
-        description: "Winter jacket",
-        price: 1200,
-        category: "Clothes",
-        image: "/images/6.jfif"
-    },
-    {
-        id: 7,
-        name: "Book A",
-        description: "Interesting novel",
-        price: 100,
-        category: "Books",
-        image: "/images/7.jpg"
-    },
-    {
-        id: 8,
-        name: "Book B",
-        description: "Science book",
-        price: 150,
-        category: "Books",
-        image: "/images/8.jfif"
-    },
-    {
-        id: 9,
-        name: "Book C",
-        description: "Programming guide",
-        price: 200,
-        category: "Books",
-        image: "/images/9.jpg"
-    },
-    
-];
+import { db } from "../shared/auth.js";
+import {
+    doc,
+    getDoc
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
+let currentProduct = null;
 
 function getProductId() {
     const params = new URLSearchParams(window.location.search);
     return params.get("id");
 }
 
-function loadProduct() {
+async function loadProduct() {
     const id = getProductId();
-
-    const product = products.find(p => p.id == id);
-
     const container = document.getElementById("productDetails");
 
-    if (!product) {
+    if (!id) {
         container.innerHTML = "Product not found";
         return;
     }
+
+    try {
+        const productDoc = await getDoc(doc(db, "products", id));
+
+        if (!productDoc.exists()) {
+            container.innerHTML = "Product not found";
+            return;
+        }
+
+        currentProduct = { id: productDoc.id, ...productDoc.data() };
+        renderProduct(currentProduct);
+
+    } catch (error) {
+        console.error("Error loading product:", error);
+        container.innerHTML = "Error loading details.";
+    }
+}
+
+function renderProduct(product) {
+    const container = document.getElementById("productDetails");
 
     container.innerHTML = `
         <div class="card">
             <h2 class="product-title">${product.name}</h2>
             <img src="${product.image || '/images/default-product.jpg'}" alt="${product.name}" class="product-image" style="max-width: 400px; height: auto;">
             <div class="product-info">
-                <p class="product-category">${product.category}</p>
-                <p>${product.description}</p>
-                <p class="product-price">${product.price} EGP</p>
-                <button class="primary mt-4" id="add-to-wishlist-btn">
-                    Add to Wishlist ❤️
-                </button>
+                <p class="product-category">${product.category || 'General'}</p>
+                <p>${product.description || 'No description available'}</p>
+                <p class="product-price">${Number(product.price).toLocaleString()} EGP</p>
+                <div class="flex gap-2">
+                    <button class="primary mt-4" id="add-to-wishlist-btn">
+                        Add to Wishlist ❤️
+                    </button>
+                    <button class="primary mt-4" id="add-to-cart-btn" style="background-color: #2ecc71;">
+                        Add to Cart 🛒
+                    </button>
+                </div>
             </div>
         </div>
     `;
+
     document.getElementById("add-to-wishlist-btn").onclick = () => addToWishlist(product.id);
+    document.getElementById("add-to-cart-btn").onclick = () => addToCart(product.id);
+}
+
+function addToCart(id) {
+    let cart = JSON.parse(localStorage.getItem("shopping_cart")) || [];
+
+    // Check if item already exists
+    const existingItem = cart.find(item => item.id === id);
+
+    if (existingItem) {
+        existingItem.qty += 1;
+        alert("Quantity updated in cart");
+    } else {
+        cart.push({
+            id: currentProduct.id,
+            name: currentProduct.name,
+            price: Number(currentProduct.price),
+            image: currentProduct.image,
+            qty: 1
+        });
+        alert("Added to cart");
+    }
+
+    localStorage.setItem("shopping_cart", JSON.stringify(cart));
 }
 
 function addToWishlist(id) {
     let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
-    const product = products.find(p => p.id === id);
-
     if (!wishlist.some(item => item.id === id)) {
-        wishlist.push(product);
+        wishlist.push(currentProduct);
         localStorage.setItem("wishlist", JSON.stringify(wishlist));
         alert("Added to wishlist");
+    } else {
+        alert("Already in wishlist");
     }
 }
 

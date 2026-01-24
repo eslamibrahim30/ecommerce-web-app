@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>My Orders | E-Shop</title>
+	<link rel="stylesheet" href="../css/main.css">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+	<nav>
+		<a href="/index.html" class="nav-brand">My Store</a>
+		<div class="nav-links">
+			<a href="/index.html" class="nav-link">Home</a>
+			<a href="/customer/wishlist.html" class="nav-link">Wishlist ❤️</a>
+			<a href="/customer/cart.html" class="nav-link">Cart 🛒</a>
+			<a href="/customer/orders.html" class="nav-link active">Orders 📦</a>
+			<div id="auth-section" class="flex items-center gap-2">
+				<span id="user-email" class="nav-link" style="font-weight: 700;"></span>
+				<button id="logout-btn" onclick="logout()" class="secondary"
+					style="display: none; padding: 0.5rem 1rem;">Logout</button>
+				<a href="/auth/login.html" id="login-nav-link" class="nav-link" style="display: none;">Login</a>
+			</div>
+		</div>
+	</nav>
+	<main class="content-wrapper">
+		<header id="customer-orders-header">
+			<h1>My Orders</h1>
+			<p>View your history and track current shipments.</p>
+		</header>
+
+		<div class="orders-card">
+			<table class="orders-table">
+				<thead>
+					<tr>
+						<th>Order ID</th>
+						<th>Date</th>
+						<th>Total</th>
+						<th>Status</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody id="customer-orders-body">
+				</tbody>
+			</table>
+		</div>
+	</main>
+
+	<script type="module" src="../js/customer/orders.js"></script>
+</body>
+
+</html>
