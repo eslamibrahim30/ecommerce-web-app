@@ -101,7 +101,7 @@ async function checkout() {
         userEmail: user.email,
         items: cart,
         total: total,
-        status: "Processing",
+        status: "Pending",
         createdAt: serverTimestamp(),
         date: new Date().toISOString(), // Fallback
         shippingAddress: "123 Main St (Default)", // Placeholder as we don't have address form yet

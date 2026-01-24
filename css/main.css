@@ -11,8 +11,8 @@
 	--border: #e2e8f0;
 	--shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 
-	--status-processing-bg: #fef3c7;
-	--status-processing-text: #92400e;
+	--status-pending-bg: #fef3c7;
+	--status-pending-text: #92400e;
 	--status-shipped-bg: #dbeafe;
 	--status-shipped-text: #1e40af;
 	--status-delivered-bg: #dcfce7;
@@ -519,9 +519,9 @@ button.destructive:hover,
 	text-transform: uppercase;
 }
 
-.status-processing {
-	background: var(--status-processing-bg);
-	color: var(--status-processing-text);
+.status-pending {
+	background: var(--status-pending-bg);
+	color: var(--status-pending-text);
 }
 
 .status-shipped {

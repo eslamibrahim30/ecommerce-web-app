@@ -27,7 +27,7 @@ function subscribeToSales() {
     // Listen to all orders for simplicity (filtering client-side for "Shipped" OR "Delivered")
     // Ideally, use 'in' operator: where('status', 'in', ['Shipped', 'Delivered'])
 
-    const q = query(ordersRef, where('status', 'in', ['Shipped', 'Delivered']));
+    const q = query(ordersRef, where('status', '==', 'Shipped'));
 
     onSnapshot(q, (snapshot) => {
         let sales = 0;
@@ -47,7 +47,7 @@ function subscribeToSales() {
  * Logic: Count of orders with status 'Processing'
  */
 function subscribeToPendingOrders() {
-    const q = query(ordersRef, where('status', '==', 'Processing'));
+    const q = query(ordersRef, where('status', '==', 'Pending'));
 
     onSnapshot(q, (snapshot) => {
         const count = snapshot.size;

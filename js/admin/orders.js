@@ -68,7 +68,7 @@ function renderOrders() {
             <td><span class="status-badge status-${order.status.toLowerCase()}">${order.status}</span></td>
             <td>
                 <button class="btn-view" onclick="toggleDetails(${index})">View Details</button>
-                ${order.status === 'Processing' ? `
+                ${order.status === 'Pending' ? `
                     <button class="btn-view" style="background:#dcfce7; color:#166534; margin-left:5px;" onclick="confirmOrder('${order.id}', ${index})">Confirm</button>
                     <button class="btn-view destructive" onclick="cancelOrder('${order.id}', ${index})">Cancel</button>
                 ` : ''}
