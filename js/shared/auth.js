@@ -219,7 +219,10 @@ async function login(email, password) {
       window.location.href = "/index.html";
     }
   } catch (error) {
-    if (errorBox) errorBox.textContent = "Wrong email or password";
+    if (errorBox) {
+      errorBox.textContent = "Wrong email or password";
+      errorBox.style.display = "block";
+    }
     console.error("Login Error:", error.message);
   }
 }
@@ -262,7 +265,10 @@ registerForm?.addEventListener("submit", (e) => {
   }
 
   if (password !== repeatPass) {
-    if (errorBox) errorBox.textContent = "Password and password-repeat are not the same";
+    if (errorBox) {
+      errorBox.textContent = "Password and password-repeat are not the same";
+      errorBox.style.display = "block";
+    }
     return;
   }
 
