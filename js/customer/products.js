@@ -71,7 +71,7 @@ function displayProducts(list) {
 }
 
 function openProduct(id) {
-    window.location.href = "product.html?id=" + id;
+    window.location.href = "../customer/productDtls.html?id=" + id;
 }
 
 function addToCart(id) {
