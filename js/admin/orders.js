@@ -84,12 +84,17 @@ function renderOrders() {
     detailsTr.id = `details-${index}`;
     detailsTr.style.display = 'none';
 
-    const itemsList = order.items.map(item => `
+    const itemsList = order.items.map(item => {
+      const qty = Number(item.qty || item.quantity || 0);
+      const price = Number(item.price || 0);
+      const total = qty * price;
+      return `
             <div class="item-row" style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee;">
-                <span>${item.name} <strong>x${item.quantity}</strong></span>
-                <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                <span>${item.name} <strong>x${qty}</strong></span>
+                <span>$${total.toFixed(2)}</span>
             </div>
-        `).join('');
+        `;
+    }).join('');
 
     detailsTr.innerHTML = `
             <td colspan="5">
