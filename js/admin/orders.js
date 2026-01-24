@@ -18,6 +18,9 @@ async function init() {
   const tbody = document.getElementById('admin-orders-body');
   tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading orders...</td></tr>';
 
+  // Event Delegation
+  tbody.addEventListener('click', handleOrderActions);
+
   subscribeToOrders();
 }
 
@@ -67,10 +70,10 @@ function renderOrders() {
             <td style="font-weight:600">$${Number(order.total).toFixed(2)}</td>
             <td><span class="status-badge status-${order.status.toLowerCase()}">${order.status}</span></td>
             <td>
-                <button class="btn-view" onclick="toggleDetails(${index})">View Details</button>
+                <button class="btn-view js-view-details" data-index="${index}">View Details</button>
                 ${order.status === 'Pending' ? `
-                    <button class="btn-view" style="background:#dcfce7; color:#166534; margin-left:5px;" onclick="confirmOrder('${order.id}', ${index})">Confirm</button>
-                    <button class="btn-view destructive" onclick="cancelOrder('${order.id}', ${index})">Cancel</button>
+                    <button class="btn-view js-confirm-order" style="background:#dcfce7; color:#166534; margin-left:5px;" data-id="${order.id}" data-index="${index}">Confirm</button>
+                    <button class="btn-view destructive js-cancel-order" data-id="${order.id}" data-index="${index}">Cancel</button>
                 ` : ''}
             </td>
         `;
@@ -116,52 +119,83 @@ function renderOrders() {
 /**
  * Action: Toggle Detail Visibility
  */
-window.toggleDetails = function (index) {
+/**
+ * Event Handler for Delegated Clicks
+ */
+function handleOrderActions(event) {
+  const target = event.target;
+
+  // View Details
+  if (target.matches('.js-view-details')) {
+    const index = target.dataset.index;
+    toggleDetails(index);
+    return;
+  }
+
+  // Confirm Order
+  if (target.matches('.js-confirm-order')) {
+    const { id, index } = target.dataset;
+    confirmOrder(id, index);
+    return;
+  }
+
+  // Cancel Order
+  if (target.matches('.js-cancel-order')) {
+    const { id, index } = target.dataset;
+    cancelOrder(id, index);
+    return;
+  }
+}
+
+/**
+ * Action: Toggle Detail Visibility
+ */
+function toggleDetails(index) {
   const el = document.getElementById(`details-${index}`);
   if (el) {
     el.style.display = el.style.display === 'none' ? 'table-row' : 'none';
   }
-};
+}
 
 /**
  * Action: Confirm Order (Processing -> Shipped)
  */
-window.confirmOrder = async function (orderId, index) {
+async function confirmOrder(orderId, index) {
   if (confirm("Are you sure you want to mark this order as Shipped?")) {
     try {
       // Update Firebase
       await updateDoc(doc(db, "orders", orderId), { status: "Shipped" });
 
       // Update local state and UI (optional as onSnapshot handles it, but good for feedback)
-      orders[index].status = "Shipped";
-      renderOrders();
-      alert("Order marked as Shipped.");
+      if (orders[index]) orders[index].status = "Shipped";
+      // No need to call renderOrders() manually if onSnapshot handles it, 
+      // but if we want instant feedback before server roundtrip we could. 
+      // However, onSnapshot is usually fast enough. 
+      // We will rely on onSnapshot to re-render to avoid conflicts.
     } catch (error) {
       console.error("Confirmation failed:", error);
       alert("Could not update order. Please try again.");
     }
   }
-};
+}
 
 /**
  * Action: Cancel Order in Firebase
  */
-window.cancelOrder = async function (orderId, index) {
+async function cancelOrder(orderId, index) {
   if (confirm("Are you sure you want to cancel this order?")) {
     try {
       // Update Firebase
       await updateDoc(doc(db, "orders", orderId), { status: "Cancelled" });
 
-      // Update local state and UI
-      orders[index].status = "Cancelled";
-      renderOrders();
-      alert("Order cancelled successfully.");
+      // Update local state
+      if (orders[index]) orders[index].status = "Cancelled";
     } catch (error) {
       console.error("Cancellation failed:", error);
       alert("Could not cancel order. Please try again.");
     }
   }
-};
+}
 
 // Start the app
 document.addEventListener('DOMContentLoaded', init);
