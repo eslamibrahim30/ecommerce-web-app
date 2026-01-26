@@ -1,13 +1,14 @@
 
 import { auth, db, checkUserLogin, getUserCartKey } from "../shared/auth.js";
-import { toast } from "../shared/notifications.js";
+import { toast, showConfirm } from "../shared/notifications.js";
 import {
     collection,
     addDoc,
     serverTimestamp,
     doc,
     getDoc,
-    updateDoc
+    updateDoc,
+    writeBatch
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 async function getCart() {
@@ -102,9 +103,46 @@ async function checkout() {
         return;
     }
 
-    // Validate stock availability and update stock quantities
+    // Confirmation Modal
+    const confirmed = await showConfirm(
+        "Are you sure you want to place this order?",
+        null,
+        null,
+        {
+            title: "Confirm Order",
+            confirmText: "Place Order",
+            cancelText: "Keep Shopping",
+            confirmClass: "btn-confirm" // Ensure we use a primary button style
+        }
+    );
+
+    if (!confirmed) return;
+
+    // Validate stock and prepare batch
     try {
-        // First, validate all items have sufficient stock
+        const batch = writeBatch(db);
+        const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+        // Prepare Order
+        const orderRef = doc(collection(db, "orders"));
+        const orderId = orderRef.id;
+
+        const order = {
+            id: orderId, // Useful to have ID in the doc
+            userId: user.uid,
+            userEmail: user.email,
+            items: cart,
+            total: total,
+            status: "Pending",
+            createdAt: serverTimestamp(),
+            date: new Date().toISOString(),
+            shippingAddress: "123 Main St (Default)",
+            paymentMethod: "Cash on Delivery"
+        };
+
+        batch.set(orderRef, order);
+
+        // Check Stock and Add to Batch
         for (const item of cart) {
             const productRef = doc(db, "products", item.id);
             const productSnap = await getDoc(productRef);
@@ -121,37 +159,13 @@ async function checkout() {
                 toast.error(`Insufficient stock for "${item.name}". Only ${currentStock} available.`);
                 return;
             }
+
+            const newStock = currentStock - item.qty;
+            batch.update(productRef, { stockQuantity: newStock });
         }
 
-        // All items validated, now update stock and create order
-        const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-
-        const order = {
-            userId: user.uid,
-            userEmail: user.email,
-            items: cart,
-            total: total,
-            status: "Pending",
-            createdAt: serverTimestamp(),
-            date: new Date().toISOString(), // Fallback
-            shippingAddress: "123 Main St (Default)", // Placeholder as we don't have address form yet
-            paymentMethod: "Cash on Delivery"
-        };
-
-        // Create order
-        await addDoc(collection(db, "orders"), order);
-
-        // Update stock quantities
-        for (const item of cart) {
-            const productRef = doc(db, "products", item.id);
-            const productSnap = await getDoc(productRef);
-            const productData = productSnap.data();
-            const newStock = (productData.stockQuantity ?? 0) - item.qty;
-
-            await updateDoc(productRef, {
-                stockQuantity: Math.max(0, newStock) // Ensure stock doesn't go negative
-            });
-        }
+        // Commit all changes atomically
+        await batch.commit();
 
         // Clear cart
         const cartKey = await getUserCartKey();
@@ -163,9 +177,14 @@ async function checkout() {
         setTimeout(() => {
             window.location.href = "orders.html";
         }, 1000);
+
     } catch (error) {
         console.error("Checkout Error:", error);
-        toast.error("Failed to place order. Please try again.");
+        if (error.code === 'permission-denied') {
+            toast.error("Permission denied. Contact support.");
+        } else {
+            toast.error("Failed to place order. Please try again.");
+        }
     }
 }
 
