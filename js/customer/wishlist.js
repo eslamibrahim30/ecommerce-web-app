@@ -28,7 +28,7 @@ async function loadWishlist() {
         itemDiv.className = "product-card";
         itemDiv.innerHTML = `
             <div class="product-image-wrapper">
-                <img src="${item.image || '/images/default-product.jpg'}" alt="${item.name}" class="product-image">
+                <img src="${item.image || '/images/no-image.jpeg'}" alt="${item.name}" class="product-image">
             </div>
             <div class="product-info">
                 <span class="product-category">${item.category || 'General'}</span>

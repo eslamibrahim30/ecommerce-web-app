@@ -19,7 +19,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 // Validation
-import { validate, validateMatch } from "./validation.js";
+import { validate, validateMatch, validateRegistration, validateLogin } from "./validation.js";
 import { toast } from "./notifications.js";
 
 // Firebase Config
@@ -216,7 +216,12 @@ async function register(email, password) {
 
     window.location.href = "/index.html";
   } catch (error) {
-    if (errorBox) errorBox.textContent = error.message;
+    // Handle specific Firebase errors
+    if (error.code === "auth/email-already-in-use") {
+      toast.error("Email is already registered");
+    } else {
+      toast.error(error.message);
+    }
     console.error("Register Error:", error.message);
   }
 }
@@ -278,38 +283,30 @@ repeatPassInput?.addEventListener("input", () => {
 // Handle Register Form
 registerForm?.addEventListener("submit", (e) => {
   e.preventDefault();
-  const email = document.getElementById("registeremail")?.value.trim();
+  const email = document.getElementById("registeremail")?.value;
   const password = passInput.value;
   const repeatPass = repeatPassInput.value;
 
-  // Validate email
-  if (!validate(email, 'email')) {
+  // Validate registration with ordered validation flow
+  if (!validateRegistration(email, password, repeatPass)) {
     return;
   }
 
-  // Validate password
-  if (!validate(password, 'password')) {
-    return;
-  }
-
-  // Validate password match
-  if (!validateMatch(password, repeatPass, "Passwords")) {
-    return;
-  }
-
-  register(email, password);
+  // Email is trimmed in validateRegistration, so trim it here too
+  register(email.trim(), password);
 });
 
 // Handle Login Form
 loginForm?.addEventListener("submit", (e) => {
   e.preventDefault();
-  const email = document.getElementById("email")?.value.trim();
+  const email = document.getElementById("email")?.value;
   const password = passInput.value;
 
-  // Validate email
-  if (!validate(email, 'email')) {
+  // Validate login with ordered validation flow
+  if (!validateLogin(email, password)) {
     return;
   }
 
-  login(email, password);
+  // Email is trimmed in validateLogin, so trim it here too
+  login(email.trim(), password);
 });

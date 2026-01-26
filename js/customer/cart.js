@@ -41,7 +41,7 @@ async function renderCart() {
 
     listContainer.innerHTML = cart.map((item, index) => `
         <div class="cart-item">
-            <img src="${item.image || '/images/default-product.jpg'}" alt="${item.name}" class="item-img" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+            <img src="${item.image || '/images/no-image.jpeg'}" alt="${item.name}" class="item-img" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
             <div class="item-info">
                 <h4>${item.name}</h4>
                 <div class="item-price">${Number(item.price).toFixed(2)} EGP</div>

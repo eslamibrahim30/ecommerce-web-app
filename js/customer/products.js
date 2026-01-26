@@ -75,7 +75,7 @@ async function displayProducts(list) {
         productDiv.innerHTML = `
             <div class="product-image-wrapper">
                 ${stockBadgeHTML}
-                <img src="${product.image || '/images/default-product.jpg'}" alt="${product.name}" class="product-image">
+                <img src="${product.image || '/images/no-image.jpeg'}" alt="${product.name}" class="product-image">
                 <div class="product-actions">
                     <button class="product-action-btn wishlist-action" title="Add to Wishlist">❤️</button>
                 </div>

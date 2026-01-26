@@ -13,8 +13,8 @@ export const validationRules = {
     },
 
     password: {
-        pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-        message: "Password must be at least 8 characters with uppercase, lowercase, number, and special character (@$!%*?&)"
+        pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/,
+        message: "Password must be at least 8 characters with uppercase, lowercase, and number"
     },
 
     productName: {
@@ -113,6 +113,97 @@ export function validateMin(value, min, fieldName = "Value", showToast = true) {
 }
 
 /**
+ * Validate registration form inputs with ordered validation flow
+ * Validates in this order: email empty → email format → password empty → repeat password empty → password strength → password match
+ * @param {string} email - Email to validate (will be trimmed)
+ * @param {string} password - Password to validate (not trimmed)
+ * @param {string} repeatPassword - Repeat password to validate (not trimmed)
+ * @param {boolean} showToast - Whether to show toast notifications
+ * @returns {boolean} - True if all validations pass, false otherwise
+ */
+export function validateRegistration(email, password, repeatPassword, showToast = true) {
+    // Trim email (preserve exact password input)
+    const trimmedEmail = email.trim();
+
+    // 1. Email Empty Validation
+    if (!trimmedEmail) {
+        if (showToast) {
+            toast.error("Email is required");
+        }
+        return false;
+    }
+
+    // 2. Email Format Validation
+    if (!validate(trimmedEmail, 'email', showToast)) {
+        return false;
+    }
+
+    // 3. Password Empty Validation
+    if (!password) {
+        if (showToast) {
+            toast.error("Password is required");
+        }
+        return false;
+    }
+
+    // 4. Repeat Password Empty Validation
+    if (!repeatPassword) {
+        if (showToast) {
+            toast.error("Please confirm your password");
+        }
+        return false;
+    }
+
+    // 5. Password Strength Validation
+    if (!validate(password, 'password', showToast)) {
+        return false;
+    }
+
+    // 6. Password Match Validation
+    if (!validateMatch(password, repeatPassword, "Password and repeat password", showToast)) {
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * Validate login form inputs with ordered validation flow
+ * Validates in this order: email empty → email format → password empty
+ * @param {string} email - Email to validate (will be trimmed)
+ * @param {string} password - Password to validate (not trimmed)
+ * @param {boolean} showToast - Whether to show toast notifications
+ * @returns {boolean} - True if all validations pass, false otherwise
+ */
+export function validateLogin(email, password, showToast = true) {
+    // Trim email
+    const trimmedEmail = email.trim();
+
+    // 1. Email Empty Validation
+    if (!trimmedEmail) {
+        if (showToast) {
+            toast.error("Email is required");
+        }
+        return false;
+    }
+
+    // 2. Email Format Validation
+    if (!validate(trimmedEmail, 'email', showToast)) {
+        return false;
+    }
+
+    // 3. Password Empty Validation
+    if (!password) {
+        if (showToast) {
+            toast.error("Password is required");
+        }
+        return false;
+    }
+
+    return true;
+}
+
+/**
  * Validate that two values match (e.g., password confirmation)
  * @param {string} value1 - First value
  * @param {string} value2 - Second value
@@ -157,5 +248,7 @@ if (typeof window !== 'undefined') {
     window.validateFields = validateFields;
     window.validateMin = validateMin;
     window.validateMatch = validateMatch;
+    window.validateRegistration = validateRegistration;
+    window.validateLogin = validateLogin;
     window.validationRules = validationRules;
 }

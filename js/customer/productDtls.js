@@ -67,7 +67,7 @@ async function renderProduct(product) {
     container.innerHTML = `
         <div class="card">
             <h2 class="product-title">${product.name}</h2>
-            <img src="${product.image || '/images/default-product.jpg'}" alt="${product.name}" class="product-image" style="max-width: 400px; height: auto;">
+            <img src="${product.image || '/images/no-image.jpeg'}" alt="${product.name}" class="product-image" style="max-width: 400px; height: auto;">
             <div class="product-info">
                 <p class="product-category">${product.category || 'General'}</p>
                 <p>${product.description || 'No description available'}</p>
@@ -121,7 +121,7 @@ function showQuantityModal(product, availableStock) {
             </div>
             <div class="quantity-modal-body">
                 <div class="quantity-product-info">
-                    <img src="${product.image || '/images/default-product.jpg'}" alt="${product.name}" class="quantity-product-image">
+                    <img src="${product.image || '/images/no-image.jpeg'}" alt="${product.name}" class="quantity-product-image">
                     <div class="quantity-product-details">
                         <h4>${product.name}</h4>
                         <div class="quantity-product-price">${product.price.toLocaleString()} EGP</div>
