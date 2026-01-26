@@ -257,3 +257,15 @@ async function addToWishlist(id) {
 }
 
 loadProduct();
+
+// Listen for auth state changes to refresh stock display
+import { auth } from "../shared/auth.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+onAuthStateChanged(auth, (user) => {
+    // Refresh product display when auth state changes (login/logout)
+    // This ensures stock calculations use the correct user's cart
+    if (currentProduct) {
+        renderProduct(currentProduct);
+    }
+});
