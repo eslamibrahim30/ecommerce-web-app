@@ -1,4 +1,4 @@
-import { db } from "../shared/auth.js";
+import { db, checkUserLogin } from "../shared/auth.js";
 import { toast } from "../shared/notifications.js";
 import {
     collection,
@@ -75,7 +75,17 @@ function openProduct(id) {
     window.location.href = "../customer/productDtls.html?id=" + id;
 }
 
-function addToCart(id) {
+async function addToCart(id) {
+    // Check authentication
+    const user = await checkUserLogin();
+    if (!user) {
+        toast.error("Please login to add items to cart");
+        setTimeout(() => {
+            window.location.href = "/auth/login.html";
+        }, 1500);
+        return;
+    }
+
     let cart = JSON.parse(localStorage.getItem("shopping_cart")) || [];
     const product = products.find(p => p.id === id);
 
@@ -99,7 +109,17 @@ function addToCart(id) {
     localStorage.setItem("shopping_cart", JSON.stringify(cart));
 }
 
-function addToWishlist(id) {
+async function addToWishlist(id) {
+    // Check authentication
+    const user = await checkUserLogin();
+    if (!user) {
+        toast.error("Please login to add items to wishlist");
+        setTimeout(() => {
+            window.location.href = "/auth/login.html";
+        }, 1500);
+        return;
+    }
+
     let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
     const product = products.find(p => p.id === id);
 
