@@ -149,6 +149,28 @@ export async function getUserRole() {
 }
 
 // =====================
+// User-Specific Storage Helpers
+// =====================
+
+/**
+ * Get the localStorage key for the current user's cart
+ * @returns {string|null} Cart key or null if not logged in
+ */
+export async function getUserCartKey() {
+  const user = await checkUserLogin();
+  return user ? `shopping_cart_${user.uid}` : null;
+}
+
+/**
+ * Get the localStorage key for the current user's wishlist
+ * @returns {string|null} Wishlist key or null if not logged in
+ */
+export async function getUserWishlistKey() {
+  const user = await checkUserLogin();
+  return user ? `wishlist_${user.uid}` : null;
+}
+
+// =====================
 // Logout Logic
 // =====================
 async function logout() {

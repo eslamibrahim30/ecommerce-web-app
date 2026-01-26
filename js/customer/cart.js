@@ -1,5 +1,5 @@
 
-import { auth, db, checkUserLogin } from "../shared/auth.js";
+import { auth, db, checkUserLogin, getUserCartKey } from "../shared/auth.js";
 import { toast } from "../shared/notifications.js";
 import {
     collection,
@@ -8,12 +8,16 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 async function getCart() {
-    const cart = localStorage.getItem('shopping_cart');
+    const cartKey = await getUserCartKey();
+    if (!cartKey) return [];
+    const cart = localStorage.getItem(cartKey);
     return cart ? JSON.parse(cart) : [];
 }
 
-function saveCart(cart) {
-    localStorage.setItem('shopping_cart', JSON.stringify(cart));
+async function saveCart(cart) {
+    const cartKey = await getUserCartKey();
+    if (!cartKey) return;
+    localStorage.setItem(cartKey, JSON.stringify(cart));
     renderCart();
 }
 
@@ -111,7 +115,10 @@ async function checkout() {
 
     try {
         await addDoc(collection(db, "orders"), order);
-        localStorage.removeItem('shopping_cart');
+        const cartKey = await getUserCartKey();
+        if (cartKey) {
+            localStorage.removeItem(cartKey);
+        }
         toast.success("Order placed successfully!");
         setTimeout(() => {
             window.location.href = "orders.html";

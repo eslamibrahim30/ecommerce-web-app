@@ -1,4 +1,4 @@
-import { db, checkUserLogin } from "../shared/auth.js";
+import { db, checkUserLogin, getUserCartKey, getUserWishlistKey } from "../shared/auth.js";
 import { toast } from "../shared/notifications.js";
 import {
     doc,
@@ -76,7 +76,10 @@ async function addToCart(id) {
         return;
     }
 
-    let cart = JSON.parse(localStorage.getItem("shopping_cart")) || [];
+    const cartKey = await getUserCartKey();
+    if (!cartKey) return;
+
+    let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
 
     // Check if item already exists
     const existingItem = cart.find(item => item.id === id);
@@ -95,7 +98,7 @@ async function addToCart(id) {
         toast.success("Added to cart");
     }
 
-    localStorage.setItem("shopping_cart", JSON.stringify(cart));
+    localStorage.setItem(cartKey, JSON.stringify(cart));
 }
 
 async function addToWishlist(id) {
@@ -109,11 +112,14 @@ async function addToWishlist(id) {
         return;
     }
 
-    let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+    const wishlistKey = await getUserWishlistKey();
+    if (!wishlistKey) return;
+
+    let wishlist = JSON.parse(localStorage.getItem(wishlistKey)) || [];
 
     if (!wishlist.some(item => item.id === id)) {
         wishlist.push(currentProduct);
-        localStorage.setItem("wishlist", JSON.stringify(wishlist));
+        localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
         toast.success("Added to wishlist");
     } else {
         toast.info("Already in wishlist");

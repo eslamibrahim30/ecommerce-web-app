@@ -1,8 +1,16 @@
-function loadWishlist() {
+import { getUserWishlistKey, checkUserLogin } from "../shared/auth.js";
+
+async function loadWishlist() {
     const container = document.getElementById("wishlistContainer");
     const emptyState = document.getElementById("emptyState");
 
-    let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+    const wishlistKey = await getUserWishlistKey();
+    if (!wishlistKey) {
+        // User not logged in, redirect handled by page auth check
+        return;
+    }
+
+    let wishlist = JSON.parse(localStorage.getItem(wishlistKey)) || [];
 
     container.innerHTML = "";
 
@@ -38,12 +46,15 @@ function loadWishlist() {
     });
 }
 
-function removeFromWishlist(id) {
-    let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+async function removeFromWishlist(id) {
+    const wishlistKey = await getUserWishlistKey();
+    if (!wishlistKey) return;
+
+    let wishlist = JSON.parse(localStorage.getItem(wishlistKey)) || [];
 
     wishlist = wishlist.filter(item => item.id !== id);
 
-    localStorage.setItem("wishlist", JSON.stringify(wishlist));
+    localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
 
     loadWishlist();
 }
