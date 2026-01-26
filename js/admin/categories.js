@@ -1,5 +1,6 @@
 import { db } from "../shared/auth.js";
 import { toast, showConfirm } from "../shared/notifications.js";
+import { validate } from "../shared/validation.js";
 import {
     collection,
     addDoc,
@@ -155,15 +156,23 @@ categoryForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const categoryId = document.getElementById("category-id").value;
-    const categoryData = {
-        name: document.getElementById("name").value.trim(),
-        description: document.getElementById("description").value.trim()
-    };
+    const name = document.getElementById("name").value.trim();
+    const description = document.getElementById("description").value.trim();
 
-    if (!categoryData.name) {
-        toast.error("Category Name is required.");
+    // Validate category name
+    if (!validate(name, 'categoryName')) {
         return;
     }
+
+    // Validate description
+    if (!validate(description, 'description')) {
+        return;
+    }
+
+    const categoryData = {
+        name,
+        description
+    };
 
     // Check for duplicates (exclude current category if editing)
     const isDuplicate = categories.some(c =>

@@ -16,14 +16,17 @@
       background: linear-gradient(135deg, hsl(var(--secondary-100)) 0%, hsl(var(--primary-100)) 100%);
       padding: 2rem;
     }
+
     .auth-card {
       width: 100%;
       max-width: 400px;
     }
+
     .auth-header {
       text-align: center;
       margin-bottom: 1.5rem;
     }
+
     .auth-logo {
       font-size: 1.5rem;
       font-weight: 800;
@@ -33,20 +36,24 @@
       background-clip: text;
       margin-bottom: 0.5rem;
     }
+
     .auth-title {
       font-size: 1.5rem;
       font-weight: 700;
       color: hsl(var(--secondary-900));
       margin: 0 0 0.25rem 0;
     }
+
     .auth-subtitle {
       color: hsl(var(--secondary-500));
       font-size: 0.9375rem;
     }
+
     .auth-form {
       margin: 0;
       max-width: 100%;
     }
+
     .auth-footer {
       text-align: center;
       padding-top: 1rem;
@@ -63,23 +70,23 @@
       <div class="auth-header">
         <div class="auth-logo">🛒 My Store</div>
       </div>
-      
+
       <form id="loginform" class="auth-form">
         <h2 class="auth-title">Welcome back</h2>
         <p class="auth-subtitle">Sign in to your account to continue</p>
 
         <div class="form-group">
           <label for="email">Email Address</label>
-          <input type="email" name="email" id="email" placeholder="you@example.com" required>
+          <input type="text" name="email" id="email" placeholder="you@example.com">
         </div>
 
         <div class="form-group">
           <label for="pass">Password</label>
-          <input type="password" name="pass" id="pass" placeholder="Enter your password" required>
+          <input type="password" name="pass" id="pass" placeholder="Enter your password">
         </div>
 
         <button id="login" type="submit" class="w-full mt-2">Sign In</button>
-        
+
         <p id="error" class="error-message mt-3" style="display: none;"></p>
 
         <div class="auth-footer mt-4">

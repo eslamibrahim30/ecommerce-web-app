@@ -692,6 +692,26 @@ button.destructive:hover,
 	transform: translateX(400px);
 }
 
+/* Toast Pulse Animation (when same notification is triggered again) */
+@keyframes toastPulse {
+	0% {
+		transform: translateX(0) scale(1);
+	}
+
+	50% {
+		transform: translateX(0) scale(1.05);
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 0 4px 15px rgba(0, 0, 0, 0.15);
+	}
+
+	100% {
+		transform: translateX(0) scale(1);
+	}
+}
+
+.toast.toast-pulse {
+	animation: toastPulse 0.3s ease-in-out;
+}
+
 /* Toast Icon */
 .toast-icon {
 	width: 24px;

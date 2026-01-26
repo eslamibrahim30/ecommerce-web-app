@@ -6,6 +6,9 @@
 // Toast notification container
 let toastContainer = null;
 
+// Map to track active toasts by message+type combination
+const activeToasts = new Map();
+
 /**
  * Initialize the toast container
  */
@@ -27,6 +30,36 @@ function initToastContainer() {
 export function showToast(message, type = 'info', duration = 4000) {
     initToastContainer();
 
+    // Create unique key for this message+type combination
+    const toastKey = `${type}:${message}`;
+
+    // Check if this toast already exists
+    if (activeToasts.has(toastKey)) {
+        const existingToast = activeToasts.get(toastKey);
+
+        // Clear the existing timeout
+        if (existingToast.timeoutId) {
+            clearTimeout(existingToast.timeoutId);
+        }
+
+        // Add pulse animation to show the notification was triggered again
+        existingToast.element.classList.add('toast-pulse');
+        setTimeout(() => {
+            existingToast.element.classList.remove('toast-pulse');
+        }, 300);
+
+        // Reset the auto-dismiss timer
+        if (duration > 0) {
+            existingToast.timeoutId = setTimeout(() => {
+                removeToast(existingToast.element);
+                activeToasts.delete(toastKey);
+            }, duration);
+        }
+
+        return existingToast.element;
+    }
+
+    // Create new toast
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
 
@@ -51,12 +84,26 @@ export function showToast(message, type = 'info', duration = 4000) {
 
     // Close button handler
     const closeBtn = toast.querySelector('.toast-close');
-    closeBtn.onclick = () => removeToast(toast);
+    closeBtn.onclick = () => {
+        removeToast(toast);
+        activeToasts.delete(toastKey);
+    };
+
+    // Store toast reference with timeout ID
+    const toastData = {
+        element: toast,
+        timeoutId: null
+    };
 
     // Auto-dismiss
     if (duration > 0) {
-        setTimeout(() => removeToast(toast), duration);
+        toastData.timeoutId = setTimeout(() => {
+            removeToast(toast);
+            activeToasts.delete(toastKey);
+        }, duration);
     }
+
+    activeToasts.set(toastKey, toastData);
 
     return toast;
 }

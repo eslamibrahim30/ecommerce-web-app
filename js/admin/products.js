@@ -1,5 +1,6 @@
 import { db } from "../shared/auth.js";
 import { toast, showConfirm } from "../shared/notifications.js";
+import { validate, validateMin } from "../shared/validation.js";
 import {
   collection,
   addDoc,
@@ -158,24 +159,52 @@ productForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const productId = document.getElementById("product-id").value;
+  const name = document.getElementById("name").value.trim();
+  const description = document.getElementById("description").value.trim();
+  const priceStr = document.getElementById("price").value.trim();
+  const category = document.getElementById("category").value;
+  const image = document.getElementById("image").value.trim();
+
+  // Validate product name
+  if (!validate(name, 'productName')) {
+    return;
+  }
+
+  // Validate description
+  if (!validate(description, 'description')) {
+    return;
+  }
+
+  // Validate price format
+  if (!validate(priceStr, 'price')) {
+    return;
+  }
+
+  const price = parseFloat(priceStr);
+
+  // Validate price is greater than 0
+  if (!validateMin(price, 0.01, "Price")) {
+    return;
+  }
+
+  // Validate category is selected
+  if (!category) {
+    toast.error("Please select a category");
+    return;
+  }
+
+  // Validate image URL if provided
+  if (image && !validate(image, 'imageUrl')) {
+    return;
+  }
+
   const productData = {
-    name: document.getElementById("name").value.trim(),
-    description: document.getElementById("description").value.trim(),
-    price: parseFloat(document.getElementById("price").value),
-    category: document.getElementById("category").value,
-    image: document.getElementById("image").value.trim()
+    name,
+    description,
+    price,
+    category,
+    image: image || '/images/default-product.jpg'
   };
-
-  // Validation
-  if (!productData.name || !productData.price || !productData.category) {
-    toast.error("Please fill in all required fields.");
-    return;
-  }
-
-  if (productData.price <= 0) {
-    toast.error("Price must be greater than 0.");
-    return;
-  }
 
   // Check for duplicates (exclude current product if editing)
   const isDuplicate = products.some(p =>

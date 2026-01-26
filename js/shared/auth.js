@@ -18,6 +18,10 @@ import {
   getDoc
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
+// Validation
+import { validate, validateMatch } from "./validation.js";
+import { toast } from "./notifications.js";
+
 // Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyB6y4sAd0BRXaHCnClSk7xDRBpAb1NGVbE",
@@ -241,10 +245,7 @@ async function login(email, password) {
       window.location.href = "/index.html";
     }
   } catch (error) {
-    if (errorBox) {
-      errorBox.textContent = "Wrong email or password";
-      errorBox.style.display = "block";
-    }
+    toast.error("Wrong email or password");
     console.error("Login Error:", error.message);
   }
 }
@@ -253,25 +254,25 @@ async function login(email, password) {
 // Event Listeners
 // =====================
 
-// =====================
-// Helper: Validate Email
-// =====================
-function isValidEmail(email) {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return re.test(email);
-}
+
 
 // =====================
 // Event Listeners
 // =====================
 
-// Clear error while typing (using optional chaining ?. to prevent null errors)
+// Clear error while typing
 passInput?.addEventListener("input", () => {
-  if (errorBox) errorBox.textContent = "";
+  if (errorBox) {
+    errorBox.textContent = "";
+    errorBox.style.display = "none";
+  }
 });
 
 repeatPassInput?.addEventListener("input", () => {
-  if (errorBox) errorBox.textContent = "";
+  if (errorBox) {
+    errorBox.textContent = "";
+    errorBox.style.display = "none";
+  }
 });
 
 // Handle Register Form
@@ -281,16 +282,18 @@ registerForm?.addEventListener("submit", (e) => {
   const password = passInput.value;
   const repeatPass = repeatPassInput.value;
 
-  if (!isValidEmail(email)) {
-    if (errorBox) errorBox.textContent = "Not valid email";
+  // Validate email
+  if (!validate(email, 'email')) {
     return;
   }
 
-  if (password !== repeatPass) {
-    if (errorBox) {
-      errorBox.textContent = "Password and password-repeat are not the same";
-      errorBox.style.display = "block";
-    }
+  // Validate password
+  if (!validate(password, 'password')) {
+    return;
+  }
+
+  // Validate password match
+  if (!validateMatch(password, repeatPass, "Passwords")) {
     return;
   }
 
@@ -303,8 +306,8 @@ loginForm?.addEventListener("submit", (e) => {
   const email = document.getElementById("email")?.value.trim();
   const password = passInput.value;
 
-  if (!isValidEmail(email)) {
-    if (errorBox) errorBox.textContent = "Not valid email";
+  // Validate email
+  if (!validate(email, 'email')) {
     return;
   }
 
