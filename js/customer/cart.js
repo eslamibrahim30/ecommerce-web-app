@@ -119,7 +119,14 @@ async function checkout() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Check if user is logged in
+    const user = await checkUserLogin();
+    if (!user) {
+        window.location.href = "/auth/login.html";
+        return;
+    }
+
     // Make updateQty and removeItem global if needed, but better to attach listeners
     // In modules, global scope is not window. 
     // We attached listeners in renderCart.
