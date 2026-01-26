@@ -4,7 +4,10 @@ import { toast } from "../shared/notifications.js";
 import {
     collection,
     addDoc,
-    serverTimestamp
+    serverTimestamp,
+    doc,
+    getDoc,
+    updateDoc
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 async function getCart() {
@@ -99,26 +102,63 @@ async function checkout() {
         return;
     }
 
-    const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-
-    const order = {
-        userId: user.uid,
-        userEmail: user.email,
-        items: cart,
-        total: total,
-        status: "Pending",
-        createdAt: serverTimestamp(),
-        date: new Date().toISOString(), // Fallback
-        shippingAddress: "123 Main St (Default)", // Placeholder as we don't have address form yet
-        paymentMethod: "Cash on Delivery"
-    };
-
+    // Validate stock availability and update stock quantities
     try {
+        // First, validate all items have sufficient stock
+        for (const item of cart) {
+            const productRef = doc(db, "products", item.id);
+            const productSnap = await getDoc(productRef);
+
+            if (!productSnap.exists()) {
+                toast.error(`Product "${item.name}" no longer exists`);
+                return;
+            }
+
+            const productData = productSnap.data();
+            const currentStock = productData.stockQuantity ?? 0;
+
+            if (currentStock < item.qty) {
+                toast.error(`Insufficient stock for "${item.name}". Only ${currentStock} available.`);
+                return;
+            }
+        }
+
+        // All items validated, now update stock and create order
+        const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+        const order = {
+            userId: user.uid,
+            userEmail: user.email,
+            items: cart,
+            total: total,
+            status: "Pending",
+            createdAt: serverTimestamp(),
+            date: new Date().toISOString(), // Fallback
+            shippingAddress: "123 Main St (Default)", // Placeholder as we don't have address form yet
+            paymentMethod: "Cash on Delivery"
+        };
+
+        // Create order
         await addDoc(collection(db, "orders"), order);
+
+        // Update stock quantities
+        for (const item of cart) {
+            const productRef = doc(db, "products", item.id);
+            const productSnap = await getDoc(productRef);
+            const productData = productSnap.data();
+            const newStock = (productData.stockQuantity ?? 0) - item.qty;
+
+            await updateDoc(productRef, {
+                stockQuantity: Math.max(0, newStock) // Ensure stock doesn't go negative
+            });
+        }
+
+        // Clear cart
         const cartKey = await getUserCartKey();
         if (cartKey) {
             localStorage.removeItem(cartKey);
         }
+
         toast.success("Order placed successfully!");
         setTimeout(() => {
             window.location.href = "orders.html";

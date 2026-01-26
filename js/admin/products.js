@@ -30,7 +30,7 @@ const productsCol = collection(db, "products");
 // Render Products Table
 async function fetchAndRenderProducts() {
   try {
-    productsTbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Loading products...</td></tr>`;
+    productsTbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">Loading products...</td></tr>`;
 
     const q = query(productsCol, orderBy("name"));
     const querySnapshot = await getDocs(q);
@@ -43,24 +43,27 @@ async function fetchAndRenderProducts() {
     renderTable();
   } catch (error) {
     console.error("Error fetching products:", error);
-    productsTbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">Error loading products.</td></tr>`;
+    productsTbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">Error loading products.</td></tr>`;
   }
 }
 
 function renderTable() {
   productsTbody.innerHTML = "";
   if (products.length === 0) {
-    productsTbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No products found.</td></tr>`;
+    productsTbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No products found.</td></tr>`;
     return;
   }
 
   products.forEach(product => {
     const tr = document.createElement("tr");
+    const stockQty = product.stockQuantity ?? 0;
+    const stockClass = stockQty === 0 ? 'style="color: #ef4444; font-weight: 600;"' : '';
     tr.innerHTML = `
             <td><img src="${product.image || '/images/default-product.jpg'}" alt="${product.name}" class="product-thumb"></td>
             <td>${product.name}</td>
             <td>${product.category}</td>
             <td>${product.price ? product.price.toLocaleString() : 0}</td>
+            <td ${stockClass}>${stockQty}</td>
             <td class="actions-cell">
                 <button class="edit-btn" data-id="${product.id}">Edit</button>
                 <button class="delete-btn" data-id="${product.id}">Delete</button>
@@ -139,6 +142,7 @@ function openEditModal(id) {
   document.getElementById("price").value = product.price;
   document.getElementById("category").value = product.category;
   document.getElementById("image").value = product.image;
+  document.getElementById("stockQuantity").value = product.stockQuantity ?? 0;
 
   productModal.style.display = "block";
 }
@@ -164,6 +168,7 @@ productForm.addEventListener("submit", async (e) => {
   const priceStr = document.getElementById("price").value.trim();
   const category = document.getElementById("category").value;
   const image = document.getElementById("image").value.trim();
+  const stockQuantityStr = document.getElementById("stockQuantity").value.trim();
 
   // Validate product name
   if (!validate(name, 'productName')) {
@@ -198,12 +203,20 @@ productForm.addEventListener("submit", async (e) => {
     return;
   }
 
+  // Validate stock quantity
+  const stockQuantity = parseInt(stockQuantityStr) || 0;
+  if (stockQuantity < 0) {
+    toast.error("Stock quantity cannot be negative");
+    return;
+  }
+
   const productData = {
     name,
     description,
     price,
     category,
-    image: image || '/images/default-product.jpg'
+    image: image || '/images/default-product.jpg',
+    stockQuantity
   };
 
   // Check for duplicates (exclude current product if editing)
