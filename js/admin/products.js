@@ -59,7 +59,7 @@ function renderTable() {
     const stockQty = product.stockQuantity ?? 0;
     const stockClass = stockQty === 0 ? 'style="color: #ef4444; font-weight: 600;"' : '';
     tr.innerHTML = `
-            <td><img src="${product.image || '/images/default-product.jpg'}" alt="${product.name}" class="product-thumb"></td>
+            <td><img src="${product.image || '/images/no-image.jpeg'}" alt="${product.name}" class="product-thumb"></td>
             <td>${product.name}</td>
             <td>${product.category}</td>
             <td>${product.price ? product.price.toLocaleString() : 0}</td>
