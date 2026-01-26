@@ -170,41 +170,84 @@ productForm.addEventListener("submit", async (e) => {
   const image = document.getElementById("image").value.trim();
   const stockQuantityStr = document.getElementById("stockQuantity").value.trim();
 
-  // Validate product name
+  // 1. Check if name is empty
+  if (!name) {
+    toast.error("Product name is required");
+    return;
+  }
+
+  // 2. Check if name is in valid format (at least 2 chars)
   if (!validate(name, 'productName')) {
     return;
   }
 
-  // Validate description
+  // 3. Check if description is empty
+  if (!description) {
+    toast.error("Description is required");
+    return;
+  }
+
+  // 4. Check if description is in valid format (at least 10 chars)
   if (!validate(description, 'description')) {
     return;
   }
 
-  // Validate price format
+  // 5. Check if price is empty
+  if (!priceStr) {
+    toast.error("Price is required");
+    return;
+  }
+
+  // 6. Check if price in valid format
   if (!validate(priceStr, 'price')) {
     return;
   }
 
   const price = parseFloat(priceStr);
 
+  // Check if price is negative
+  if (price < 0) {
+    toast.error("Price cannot be negative");
+    return;
+  }
+
   // Validate price is greater than 0
   if (!validateMin(price, 0.01, "Price")) {
     return;
   }
 
-  // Validate category is selected
+  // 7. Check if Category is selected
   if (!category) {
     toast.error("Please select a category");
     return;
   }
 
-  // Validate image URL if provided
-  if (image && !validate(image, 'imageUrl')) {
+  // 8. Check if image url is empty
+  if (!image) {
+    toast.error("Image URL is required");
     return;
   }
 
-  // Validate stock quantity
-  const stockQuantity = parseInt(stockQuantityStr) || 0;
+  // 9. Check if it in valid format
+  if (!validate(image, 'imageUrl')) {
+    return;
+  }
+
+  // 10. Check if stock quantity is empty
+  if (!stockQuantityStr) {
+    toast.error("Stock quantity is required");
+    return;
+  }
+
+  // 11. Check if stock quantity in valid format
+  const stockQuantity = parseInt(stockQuantityStr);
+
+  if (stockQuantity < 0 || isNaN(stockQuantity)) {
+    toast.error("Stock quantity must be a valid number");
+    return;
+  }
+
+  // Check if stock quantity is negative
   if (stockQuantity < 0) {
     toast.error("Stock quantity cannot be negative");
     return;

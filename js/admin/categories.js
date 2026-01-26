@@ -185,12 +185,24 @@ categoryForm.addEventListener("submit", async (e) => {
     const name = document.getElementById("name").value.trim();
     const description = document.getElementById("description").value.trim();
 
-    // Validate category name
+    // 1. Check if category name is empty
+    if (!name) {
+        toast.error("Category name is required");
+        return;
+    }
+
+    // 2. Check if category name in valid format
     if (!validate(name, 'categoryName')) {
         return;
     }
 
-    // Validate description
+    // 3. Check if category desc is empty
+    if (!description) {
+        toast.error("Category description is required");
+        return;
+    }
+
+    // 4. Check if category desc in valid format
     if (!validate(description, 'description')) {
         return;
     }
