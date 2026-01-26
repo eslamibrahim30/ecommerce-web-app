@@ -215,7 +215,7 @@ productForm.addEventListener("submit", async (e) => {
     description,
     price,
     category,
-    image: image || '/images/default-product.jpg',
+    image: image || '/images/no-image.jpeg',
     stockQuantity
   };
 
