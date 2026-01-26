@@ -9,7 +9,9 @@ import {
     doc,
     query,
     orderBy,
-    onSnapshot
+    onSnapshot,
+    getDocs,
+    where
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 // DOM Elements
@@ -100,8 +102,31 @@ async function updateCategory(id, updatedData) {
 }
 
 async function deleteCategory(id) {
+    const category = categories.find(c => c.id === id);
+    if (!category) return;
+
+    // Check if any products use this category
+    try {
+        const productsRef = collection(db, "products");
+        const q = query(productsRef, where("category", "==", category.name));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            const productCount = querySnapshot.size;
+            toast.error(
+                `Cannot delete "${category.name}". ${productCount} product${productCount > 1 ? 's' : ''} ${productCount > 1 ? 'are' : 'is'} using this category. Please reassign or delete ${productCount > 1 ? 'them' : 'it'} first.`
+            );
+            return;
+        }
+    } catch (error) {
+        console.error("Error checking products:", error);
+        toast.error("Failed to verify category usage");
+        return;
+    }
+
+    // No products found, proceed with confirmation
     const confirmed = await showConfirm(
-        "Are you sure you want to delete this category?",
+        `Are you sure you want to delete "${category.name}"?`,
         null,
         null,
         { title: "Delete Category", confirmText: "Yes, Delete", cancelText: "Cancel" }
@@ -111,6 +136,7 @@ async function deleteCategory(id) {
         try {
             const categoryDoc = doc(db, "categories", id);
             await deleteDoc(categoryDoc);
+            toast.success("Category deleted successfully");
         } catch (error) {
             console.error("Error deleting category:", error);
             toast.error("Failed to delete category");

@@ -68,7 +68,7 @@ async function displayProducts(list) {
         } else if (availableStock <= 5) {
             stockBadgeHTML = `<div class="stock-badge low-stock">${availableStock} Left</div>`;
         } else {
-            stockBadgeHTML = `<div class="stock-badge in-stock">${availableStock} In Stock</div>`;
+            stockBadgeHTML = `<div class="stock-badge in-stock">In Stock</div>`;
         }
 
         productDiv.className = `product-card ${stockClass}`;
