@@ -1,4 +1,5 @@
 import { db, checkUserLogin } from "../shared/auth.js";
+import { toast, showConfirm } from "../shared/notifications.js";
 import {
   collection,
   query,
@@ -149,7 +150,14 @@ function toggleDetails(index) {
  * Action: Cancel Order in Firebase
  */
 async function cancelOrder(orderId, index) {
-  if (confirm("Are you sure you want to cancel this order?")) {
+  const confirmed = await showConfirm(
+    "Are you sure you want to cancel this order?",
+    null,
+    null,
+    { title: "Cancel Order", confirmText: "Yes, Cancel", cancelText: "No, Keep It" }
+  );
+
+  if (confirmed) {
     try {
       // Update Firebase
       await updateDoc(doc(db, "orders", orderId), { status: "Cancelled" });
@@ -157,10 +165,10 @@ async function cancelOrder(orderId, index) {
       // Update local state and UI
       orders[index].status = "Cancelled";
       renderOrders();
-      alert("Order cancelled successfully.");
+      toast.success("Order cancelled successfully.");
     } catch (error) {
       console.error("Cancellation failed:", error);
-      alert("Could not cancel order. Please try again.");
+      toast.error("Could not cancel order. Please try again.");
     }
   }
 }

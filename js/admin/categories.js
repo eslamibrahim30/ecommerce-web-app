@@ -1,4 +1,5 @@
 import { db } from "../shared/auth.js";
+import { toast, showConfirm } from "../shared/notifications.js";
 import {
     collection,
     addDoc,
@@ -83,7 +84,7 @@ async function addCategory(categoryData) {
         // No need to manually fetch, onSnapshot handles it
     } catch (error) {
         console.error("Error adding category:", error);
-        alert("Failed to add category");
+        toast.error("Failed to add category");
     }
 }
 
@@ -93,18 +94,25 @@ async function updateCategory(id, updatedData) {
         await updateDoc(categoryDoc, updatedData);
     } catch (error) {
         console.error("Error updating category:", error);
-        alert("Failed to update category");
+        toast.error("Failed to update category");
     }
 }
 
 async function deleteCategory(id) {
-    if (confirm("Are you sure you want to delete this category?")) {
+    const confirmed = await showConfirm(
+        "Are you sure you want to delete this category?",
+        null,
+        null,
+        { title: "Delete Category", confirmText: "Yes, Delete", cancelText: "Cancel" }
+    );
+
+    if (confirmed) {
         try {
             const categoryDoc = doc(db, "categories", id);
             await deleteDoc(categoryDoc);
         } catch (error) {
             console.error("Error deleting category:", error);
-            alert("Failed to delete category");
+            toast.error("Failed to delete category");
         }
     }
 }
@@ -153,7 +161,7 @@ categoryForm.addEventListener("submit", async (e) => {
     };
 
     if (!categoryData.name) {
-        alert("Category Name is required.");
+        toast.error("Category Name is required.");
         return;
     }
 
@@ -163,7 +171,7 @@ categoryForm.addEventListener("submit", async (e) => {
     );
 
     if (isDuplicate) {
-        alert("A category with this name already exists.");
+        toast.error("A category with this name already exists.");
         return;
     }
 

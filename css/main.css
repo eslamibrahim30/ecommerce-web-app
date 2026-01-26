@@ -646,3 +646,244 @@ button.destructive:hover,
 #customer-nav a.active {
 	color: var(--primary);
 }
+
+/* ========================================
+   NOTIFICATION SYSTEM
+   ======================================== */
+
+/* Toast Container */
+.toast-container {
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	z-index: 9999;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	max-width: 400px;
+	pointer-events: none;
+}
+
+/* Toast Base */
+.toast {
+	background: var(--surface);
+	border-radius: 8px;
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.1);
+	padding: 16px;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	min-width: 300px;
+	max-width: 400px;
+	border-left: 4px solid;
+	pointer-events: auto;
+	opacity: 0;
+	transform: translateX(400px);
+	transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.toast.toast-show {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+.toast.toast-hide {
+	opacity: 0;
+	transform: translateX(400px);
+}
+
+/* Toast Icon */
+.toast-icon {
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 14px;
+	font-weight: 700;
+	flex-shrink: 0;
+}
+
+/* Toast Message */
+.toast-message {
+	flex: 1;
+	font-size: 0.9375rem;
+	font-weight: 500;
+	color: var(--text-main);
+	line-height: 1.4;
+}
+
+/* Toast Close Button */
+.toast-close {
+	background: transparent;
+	border: none;
+	color: var(--text-muted);
+	font-size: 20px;
+	cursor: pointer;
+	padding: 0;
+	width: 24px;
+	height: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 4px;
+	transition: 0.2s;
+	flex-shrink: 0;
+}
+
+.toast-close:hover {
+	background: var(--bg);
+	color: var(--text-main);
+}
+
+/* Toast Types */
+.toast-success {
+	border-left-color: #10b981;
+}
+
+.toast-success .toast-icon {
+	background: #d1fae5;
+	color: #065f46;
+}
+
+.toast-error {
+	border-left-color: #ef4444;
+}
+
+.toast-error .toast-icon {
+	background: #fee2e2;
+	color: #991b1b;
+}
+
+.toast-warning {
+	border-left-color: #f59e0b;
+}
+
+.toast-warning .toast-icon {
+	background: #fef3c7;
+	color: #92400e;
+}
+
+.toast-info {
+	border-left-color: #3b82f6;
+}
+
+.toast-info .toast-icon {
+	background: #dbeafe;
+	color: #1e40af;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.5);
+	backdrop-filter: blur(4px);
+	-webkit-backdrop-filter: blur(4px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 10000;
+	opacity: 0;
+	transition: opacity 0.3s ease;
+	padding: 20px;
+}
+
+.modal-overlay.modal-show {
+	opacity: 1;
+}
+
+.modal-overlay.modal-show .modal-dialog {
+	transform: scale(1);
+	opacity: 1;
+}
+
+/* Modal Dialog */
+.modal-dialog {
+	background: var(--surface);
+	border-radius: 12px;
+	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+	max-width: 480px;
+	width: 100%;
+	transform: scale(0.9);
+	opacity: 0;
+	transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Modal Header */
+.modal-header {
+	padding: 24px 24px 16px;
+	border-bottom: 1px solid var(--border);
+}
+
+.modal-title {
+	margin: 0;
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: var(--text-main);
+}
+
+/* Modal Body */
+.modal-body {
+	padding: 24px;
+}
+
+.modal-message {
+	margin: 0;
+	font-size: 1rem;
+	line-height: 1.6;
+	color: var(--text-main);
+}
+
+/* Modal Footer */
+.modal-footer {
+	padding: 16px 24px 24px;
+	display: flex;
+	gap: 12px;
+	justify-content: flex-end;
+}
+
+.modal-footer .btn {
+	min-width: 100px;
+}
+
+.btn-confirm {
+	background: var(--primary);
+	color: white;
+}
+
+.btn-confirm:hover {
+	filter: brightness(0.9);
+}
+
+.btn-cancel {
+	background: var(--bg);
+	color: var(--text-main);
+	border: 1px solid var(--border);
+}
+
+.btn-cancel:hover {
+	background: var(--border);
+}
+
+/* Responsive Toast */
+@media (max-width: 640px) {
+	.toast-container {
+		left: 20px;
+		right: 20px;
+		max-width: none;
+	}
+
+	.toast {
+		min-width: auto;
+		max-width: none;
+	}
+
+	.modal-dialog {
+		margin: 20px;
+	}
+}

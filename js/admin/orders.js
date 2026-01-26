@@ -1,6 +1,7 @@
 import { collection, query, orderBy, onSnapshot, doc, updateDoc }
   from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 import { db } from "../shared/auth.js";
+import { toast, showConfirm } from "../shared/notifications.js";
 
 
 // Global state to hold fetched orders
@@ -166,7 +167,14 @@ function toggleDetails(index) {
  * Action: Confirm Order (Processing -> Shipped)
  */
 async function confirmOrder(orderId, index) {
-  if (confirm("Are you sure you want to mark this order as Shipped?")) {
+  const confirmed = await showConfirm(
+    "Are you sure you want to mark this order as Shipped?",
+    null,
+    null,
+    { title: "Confirm Shipment", confirmText: "Yes, Ship It", cancelText: "Cancel" }
+  );
+
+  if (confirmed) {
     try {
       // Update Firebase
       await updateDoc(doc(db, "orders", orderId), { status: "Shipped" });
@@ -179,7 +187,7 @@ async function confirmOrder(orderId, index) {
       // We will rely on onSnapshot to re-render to avoid conflicts.
     } catch (error) {
       console.error("Confirmation failed:", error);
-      alert("Could not update order. Please try again.");
+      toast.error("Could not update order. Please try again.");
     }
   }
 }
@@ -188,7 +196,14 @@ async function confirmOrder(orderId, index) {
  * Action: Cancel Order in Firebase
  */
 async function cancelOrder(orderId, index) {
-  if (confirm("Are you sure you want to cancel this order?")) {
+  const confirmed = await showConfirm(
+    "Are you sure you want to cancel this order?",
+    null,
+    null,
+    { title: "Cancel Order", confirmText: "Yes, Cancel", cancelText: "No, Keep It" }
+  );
+
+  if (confirmed) {
     try {
       // Update Firebase
       await updateDoc(doc(db, "orders", orderId), { status: "Cancelled" });
@@ -197,7 +212,7 @@ async function cancelOrder(orderId, index) {
       if (orders[index]) orders[index].status = "Cancelled";
     } catch (error) {
       console.error("Cancellation failed:", error);
-      alert("Could not cancel order. Please try again.");
+      toast.error("Could not cancel order. Please try again.");
     }
   }
 }

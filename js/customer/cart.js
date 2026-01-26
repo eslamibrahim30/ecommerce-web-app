@@ -1,5 +1,6 @@
 
 import { auth, db, checkUserLogin } from "../shared/auth.js";
+import { toast } from "../shared/notifications.js";
 import {
     collection,
     addDoc,
@@ -83,14 +84,14 @@ function updateTotals(total) {
 async function checkout() {
     const user = await checkUserLogin();
     if (!user) {
-        alert("Please login to checkout.");
+        toast.error("Please login to checkout.");
         window.location.href = "/auth/login.html";
         return;
     }
 
     const cart = await getCart();
     if (cart.length === 0) {
-        alert("Your cart is empty!");
+        toast.warning("Your cart is empty!");
         return;
     }
 
@@ -111,11 +112,13 @@ async function checkout() {
     try {
         await addDoc(collection(db, "orders"), order);
         localStorage.removeItem('shopping_cart');
-        alert("Order placed successfully!");
-        window.location.href = "orders.html";
+        toast.success("Order placed successfully!");
+        setTimeout(() => {
+            window.location.href = "orders.html";
+        }, 1000);
     } catch (error) {
         console.error("Checkout Error:", error);
-        alert("Failed to place order. Please try again.");
+        toast.error("Failed to place order. Please try again.");
     }
 }
 

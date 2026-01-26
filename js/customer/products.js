@@ -1,4 +1,5 @@
 import { db } from "../shared/auth.js";
+import { toast } from "../shared/notifications.js";
 import {
     collection,
     getDocs,
@@ -83,7 +84,7 @@ function addToCart(id) {
 
     if (existingItem) {
         existingItem.qty += 1;
-        alert("Quantity updated in cart");
+        toast.success("Quantity updated in cart");
     } else {
         cart.push({
             id: product.id,
@@ -92,7 +93,7 @@ function addToCart(id) {
             image: product.image,
             qty: 1
         });
-        alert("Added to cart");
+        toast.success("Added to cart");
     }
 
     localStorage.setItem("shopping_cart", JSON.stringify(cart));
@@ -105,9 +106,9 @@ function addToWishlist(id) {
     if (!wishlist.some(item => item.id === id)) {
         wishlist.push(product);
         localStorage.setItem("wishlist", JSON.stringify(wishlist));
-        alert("Added to wishlist");
+        toast.success("Added to wishlist");
     } else {
-        alert("Already in wishlist");
+        toast.info("Already in wishlist");
     }
 }
 

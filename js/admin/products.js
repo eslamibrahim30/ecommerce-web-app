@@ -1,4 +1,5 @@
 import { db } from "../shared/auth.js";
+import { toast, showConfirm } from "../shared/notifications.js";
 import {
   collection,
   addDoc,
@@ -83,7 +84,7 @@ async function addProduct(productData) {
     await fetchAndRenderProducts();
   } catch (error) {
     console.error("Error adding product:", error);
-    alert("Failed to add product");
+    toast.error("Failed to add product");
   }
 }
 
@@ -94,19 +95,26 @@ async function updateProduct(id, updatedProduct) {
     await fetchAndRenderProducts();
   } catch (error) {
     console.error("Error updating product:", error);
-    alert("Failed to update product");
+    toast.error("Failed to update product");
   }
 }
 
 async function deleteProduct(id) {
-  if (confirm("Are you sure you want to delete this product?")) {
+  const confirmed = await showConfirm(
+    "Are you sure you want to delete this product?",
+    null,
+    null,
+    { title: "Delete Product", confirmText: "Yes, Delete", cancelText: "Cancel" }
+  );
+
+  if (confirmed) {
     try {
       const productRef = doc(db, "products", id);
       await deleteDoc(productRef);
       await fetchAndRenderProducts();
     } catch (error) {
       console.error("Error deleting product:", error);
-      alert("Failed to delete product");
+      toast.error("Failed to delete product");
     }
   }
 }
@@ -160,12 +168,12 @@ productForm.addEventListener("submit", async (e) => {
 
   // Validation
   if (!productData.name || !productData.price || !productData.category) {
-    alert("Please fill in all required fields.");
+    toast.error("Please fill in all required fields.");
     return;
   }
 
   if (productData.price <= 0) {
-    alert("Price must be greater than 0.");
+    toast.error("Price must be greater than 0.");
     return;
   }
 
@@ -175,7 +183,7 @@ productForm.addEventListener("submit", async (e) => {
   );
 
   if (isDuplicate) {
-    alert("A product with this name already exists.");
+    toast.error("A product with this name already exists.");
     return;
   }
 
